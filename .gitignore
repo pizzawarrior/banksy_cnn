@@ -1,0 +1,5 @@
+# no jpg images
+*.jpg
+
+# no images file
+images/
