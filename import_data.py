@@ -18,7 +18,7 @@ convert to grayscale and vectorize each one.
 
 def get_img_entropy(img):
     '''
-    flattens a grayscale image then computes a histogram and probability dist of
+    flattens a grayscale image and tile then computes a histogram and probability dist of
     each pixel. then computes the total image entropy and returns it.
     '''
     hist, _ = np.histogram(img.flatten(), bins=256, range=(0, 256))
@@ -62,10 +62,9 @@ def make_img_tiles(img, h, w, overlap):
     orig_height, orig_len = img.shape
 
     assert isinstance(overlap, float)
-    offset = 1 - overlap  #Ex: overlap=80, h=100, w=100, offset=20
+    offset = 1 - overlap
     overlap_h, overlap_w = int(offset * h), int(offset * w)
 
-    # generic tiles, minimal overlap
     for i in range(0, orig_height, h):
         for j in range(0, orig_len, w):
             tile = img[i:i + h, j:j + w]
@@ -76,22 +75,12 @@ def make_img_tiles(img, h, w, overlap):
     return tiles
 
 
-def make_dataset(tiles, h=100, w=100, overlap=.5):
-    '''
-    flatten all tiles that pass the entropy test, and add them to a single np.array (matrix).
-    this is for training and testing.
-    normalize both matrices by dividing by 255.
-    make new labels vector.
-    '''
-    pass
-
-
-def convert_tile_to_vector(img):
+def convert_tile_to_vector(tile):
     '''
     flatten each TILE and turn it into a vector
     '''
-    img_vec = np.array(img).reshape(-1)
-    return img_vec
+    return np.array(tile).reshape(-1)
+
 
 
 def load_image(img_file, img_dir):
@@ -106,7 +95,7 @@ def load_image(img_file, img_dir):
     return img
 
 
-def preprocess_images(img_dir='images'):
+def get_images(img_dir='images'):
     '''
     loads all images, converts them to grayscale and saves them to a python list.
     also creates a list of labels and returns the list of images with respective labels.
@@ -125,16 +114,49 @@ def preprocess_images(img_dir='images'):
     return img_list, labels
 
 
-images_list, labels = preprocess_images()
+def make_dataset(image_list, labels, tile_h=100, tile_w=100, overlap=.8, entropy_threshold=3):
+    '''
+    flatten all tiles that pass the entropy test, and add them to a single np.array (matrix).
+    this is for training and testing.
+    normalize both matrices by dividing by 255.
+    make new labels vector.
+    TODO: delete acceptible tiles all together. we can convert these directly to vectors.
+    '''
+    tile_vectors = []
+    updated_labels = []
+    for img, label in zip(image_list, labels):
+        tiles = make_img_tiles(img, tile_h, tile_w, overlap)
+        img_entropy = get_img_entropy(img)
+        # print(f'Image entropy: {img_entropy}')
+        for tile in tiles:
+            tile_entropy = get_img_entropy(tile)
+            if tile_entropy >= img_entropy - entropy_threshold:
+                tile_vector = convert_tile_to_vector(tile)
+                tile_vectors.append(tile_vector)
+                updated_labels.append(label)
+    df = np.array(tile_vectors)
+    return df, updated_labels
 
 
+images_list, labels = get_images()
 img = images_list[9]
-new_img = img[:542, :631]
-# print(new_img.shape)
-tiles = make_img_tiles(new_img, 100, 100, overlap=.8)
-print(len(tiles))
 
 # for tile in tiles:
 #     plt.imshow(tile, cmap='gray')
 #     plt.show()
 # print([arr.shape for arr in tiles])
+
+# parent_entropy = get_img_entropy(img)
+df, updated_labels = make_dataset(images_list, labels)
+print(df.shape)
+print(len(updated_labels))
+# print(f'Tile entropy: {tile_entropy}')
+# tile_entropy = sum(tile >= parent_entropy for tile in e) # 13
+# print(tile)
+
+# entropy_ind = [idx for idx, e in enumerate(e) if e >= parent_entropy - 1]
+# print(len(entropy_ind))
+
+# for idx in entropy_ind:
+#     plt.imshow(tiles[idx], cmap='gray')
+#     plt.show()
