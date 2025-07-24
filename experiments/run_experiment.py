@@ -14,7 +14,7 @@ def run_experiment():
     # define hyperparameter sets to test
     hyperparameter_sets = [
         {
-            'tile_h': 200, 'tile_w': 200, 'overlap': 0.8, 'entropy_threshold': 1.0,
+            'tile_h': 250, 'tile_w': 250, 'overlap': 0.5, 'entropy_threshold': 1.0,
             'architecture': '5layer', 'learning_rate': 0.001
         },
         # {
@@ -36,7 +36,7 @@ def run_experiment():
 
         # train model, may need to increase epochs/ batches
         cv_summary, fold_results, saved_models = train_model_with_cv(
-            X_train, y_train, hyperparams, n_folds=4, epochs=60, batch_size=16
+            X_train, y_train, hyperparams, n_folds=4, epochs=50, batch_size=32
         )
 
         results.append({

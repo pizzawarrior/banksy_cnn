@@ -16,6 +16,8 @@ def create_tiles_dataset(images, labels, tile_h, tile_w, overlap, entropy_thresh
         tiles = make_img_tiles(img, tile_h, tile_w, overlap)
         img_entropy = get_img_entropy(img)
 
+        assert img_entropy < entropy_threshold, f'Please use an entropy threshold lower than {img_entropy}'
+
         valid_tiles = 0
         for tile in tiles:
             tile_entropy = get_img_entropy(tile)

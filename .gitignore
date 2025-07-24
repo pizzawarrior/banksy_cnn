@@ -1,5 +1,7 @@
 # no jpg images
 *.jpg
+*.keras
+*.h5
 
 # no images file
 images/

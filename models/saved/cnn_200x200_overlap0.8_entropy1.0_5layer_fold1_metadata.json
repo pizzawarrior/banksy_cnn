@@ -9,16 +9,16 @@
   },
   "fold": 1,
   "metrics": {
-    "accuracy": 0.49032258064516127,
-    "f1": 0.658008658008658,
-    "precision": 0.49032258064516127,
-    "recall": 1.0,
-    "auc": 0.4562375083277814,
-    "val_accuracy": 0.49032258064516127,
-    "val_f1": 0.658008658008658,
-    "val_precision": 0.49032258064516127,
-    "val_recall": 1.0,
-    "val_auc": 0.4562375083277814
+    "accuracy": 0.6967741935483871,
+    "f1": 0.7388888888888889,
+    "precision": 0.6394230769230769,
+    "recall": 0.875,
+    "auc": 0.8371918720852765,
+    "val_accuracy": 0.6967741935483871,
+    "val_f1": 0.7388888888888889,
+    "val_precision": 0.6394230769230769,
+    "val_recall": 0.875,
+    "val_auc": 0.8371918720852765
   },
   "model_path": "models/saved/cnn_200x200_overlap0.8_entropy1.0_5layer_fold1.keras",
   "history_path": "models/saved/cnn_200x200_overlap0.8_entropy1.0_5layer_fold1_history.json"

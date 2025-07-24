@@ -4,9 +4,6 @@ from tensorflow.keras import layers
 
 
 def cnn_3_layer(tile_h, tile_w, learning_rate=0.001):
-    # troubleshooting:
-    # print("TensorFlow version:", tf.__version__)
-
     model = keras.Sequential()
     model.add(layers.Input(shape=(tile_h, tile_w, 1)))
     model.add(layers.Conv2D(32, (3, 3), activation='relu', padding='same'))

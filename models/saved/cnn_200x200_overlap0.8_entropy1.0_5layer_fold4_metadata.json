@@ -13,12 +13,12 @@
     "f1": 0.6977886977886978,
     "precision": 0.5358490566037736,
     "recall": 1.0,
-    "auc": 0.42201992442459635,
+    "auc": 0.4998854918126646,
     "val_accuracy": 0.5358490566037736,
     "val_f1": 0.6977886977886978,
     "val_precision": 0.5358490566037736,
     "val_recall": 1.0,
-    "val_auc": 0.42201992442459635
+    "val_auc": 0.4998854918126646
   },
   "model_path": "models/saved/cnn_200x200_overlap0.8_entropy1.0_5layer_fold4.keras",
   "history_path": "models/saved/cnn_200x200_overlap0.8_entropy1.0_5layer_fold4_history.json"
