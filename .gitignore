@@ -3,3 +3,6 @@
 
 # no images file
 images/
+
+scratch.txt
+.venv/

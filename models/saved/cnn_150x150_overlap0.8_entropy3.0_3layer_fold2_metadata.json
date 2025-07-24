@@ -1,0 +1,25 @@
+{
+  "hyperparameters": {
+    "tile_h": 150,
+    "tile_w": 150,
+    "overlap": 0.8,
+    "entropy_threshold": 3.0,
+    "architecture": "3layer",
+    "learning_rate": 0.001
+  },
+  "fold": 2,
+  "metrics": {
+    "accuracy": 0.7694524495677233,
+    "f1": 0.8650927487352446,
+    "precision": 0.7702702702702703,
+    "recall": 0.9865384615384616,
+    "auc": 0.6664898320070733,
+    "val_accuracy": 0.7694524495677233,
+    "val_f1": 0.8650927487352446,
+    "val_precision": 0.7702702702702703,
+    "val_recall": 0.9865384615384616,
+    "val_auc": 0.6664898320070733
+  },
+  "model_path": "models/saved/cnn_150x150_overlap0.8_entropy3.0_3layer_fold2.h5",
+  "history_path": "models/saved/cnn_150x150_overlap0.8_entropy3.0_3layer_fold2_history.json"
+}
