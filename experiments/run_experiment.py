@@ -13,18 +13,18 @@ def run_experiment():
 
     # define hyperparameter sets to test
     hyperparameter_sets = [
-        # {
-        #     'tile_h': 100, 'tile_w': 100, 'overlap': 0.5, 'entropy_threshold': 1.0,
-        #     'architecture': '5layer', 'learning_rate': 0.001
-        # },
         {
-            'tile_h': 100, 'tile_w': 100, 'overlap': 0.5, 'entropy_threshold': 2.0,
+            'tile_h': 200, 'tile_w': 200, 'overlap': 0.8, 'entropy_threshold': 1.0,
             'architecture': '5layer', 'learning_rate': 0.001
         },
-        {
-            'tile_h': 150, 'tile_w': 150, 'overlap': 0.8, 'entropy_threshold': 3.0,
-            'architecture': '5layer', 'learning_rate': 0.001
-        }
+        # {
+        #     'tile_h': 100, 'tile_w': 100, 'overlap': 0.5, 'entropy_threshold': 2.0,
+        #     'architecture': '5layer', 'learning_rate': 0.001
+        # },
+        # {
+        #     'tile_h': 150, 'tile_w': 150, 'overlap': 0.8, 'entropy_threshold': 3.0,
+        #     'architecture': '5layer', 'learning_rate': 0.001
+        # }
     ]
 
     results = []
