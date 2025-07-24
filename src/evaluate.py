@@ -4,9 +4,10 @@ from src.image_tiler import make_img_tiles
 from src.get_entropy import get_img_entropy
 from src.prepare_tiles import prepare_tile_for_cnn
 from src.get_metrics import calc_metrics
+from src.get_hyperparams import get_hyperparams
 
 
-def evaluate_on_test_set(X_test, y_test, hyperparams, model_path=None, model=None):
+def evaluate_on_test_set(X_test, y_test, hyperparams=None, model_path=None, model=None):
     '''
     Evaluate a trained model on the test set using tile-level predictions
     averaged to image-level predictions.
@@ -15,6 +16,9 @@ def evaluate_on_test_set(X_test, y_test, hyperparams, model_path=None, model=Non
         model = load_model(model_path)
     elif model is None:
         raise ValueError('Either model or model_path must be provided')
+
+    if model_path:
+        hyperparams = get_hyperparams(model_path)
 
     print('\nEvaluating on test set...')
 
@@ -30,7 +34,7 @@ def evaluate_on_test_set(X_test, y_test, hyperparams, model_path=None, model=Non
             tile_entropy = get_img_entropy(tile)
             if tile_entropy >= img_entropy - hyperparams['entropy_threshold']:
                 tile_cnn = prepare_tile_for_cnn(tile, augment=False)
-                tile_cnn = np.expand_dims(tile_cnn, axis=0)  # add batch dimension
+                tile_cnn = np.expand_dims(tile_cnn, axis=0)  # add batch dim
                 pred = model.predict(tile_cnn, verbose=0)[0][0]
                 tile_predictions.append(pred)
 
@@ -43,12 +47,14 @@ def evaluate_on_test_set(X_test, y_test, hyperparams, model_path=None, model=Non
             print(f'Warning: No valid tiles found for test image with label {true_label}')
 
     # calc image-level metrics
-    image_pred_binary = (np.array(image_predictions) > 0.5).astype(int)
+    classification_threshold = .4
+    image_pred_binary = (np.array(image_predictions) > classification_threshold).astype(int)
     test_metrics = calc_metrics(
         image_true_labels, image_pred_binary, image_predictions
     )
 
     print('\nTest Set Results (Image-level):')
+    print(f'classification-threshold: {classification_threshold}')
     for metric, value in test_metrics.items():
         print(f'{metric}: {value:.4f}')
 
