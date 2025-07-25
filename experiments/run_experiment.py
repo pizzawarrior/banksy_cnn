@@ -13,17 +13,20 @@ def run_experiment():
 
     # define hyperparameter sets to test
     hyperparameter_sets = [
+        # {
+        #     'tile_h': 150, 'tile_w': 150, 'overlap': 0.5, 'entropy_threshold': 2.0,
+        #     'architecture': '3layer', 'learning_rate': 0.001, 'batch_size': 32,
+        #     'classification_threshold': .4
+        # },
         {
-            'tile_h': 250, 'tile_w': 250, 'overlap': 0.5, 'entropy_threshold': 1.0,
-            'architecture': '5layer', 'learning_rate': 0.001
+            'tile_h': 200, 'tile_w': 200, 'overlap': 0.6, 'entropy_threshold': 2.5,
+            'architecture': '3layer', 'learning_rate': 0.001, 'batch_size': 32,
+            'classification_threshold': .4
         },
         # {
-        #     'tile_h': 100, 'tile_w': 100, 'overlap': 0.5, 'entropy_threshold': 2.0,
-        #     'architecture': '5layer', 'learning_rate': 0.001
-        # },
-        # {
-        #     'tile_h': 150, 'tile_w': 150, 'overlap': 0.8, 'entropy_threshold': 3.0,
-        #     'architecture': '5layer', 'learning_rate': 0.001
+        #     'tile_h': 250, 'tile_w': 250, 'overlap': 0.8, 'entropy_threshold': 2.0,
+        #     'architecture': '5layer', 'learning_rate': 0.001, 'batch_size': 32,
+        #     'classification_threshold': .4
         # }
     ]
 
@@ -34,9 +37,9 @@ def run_experiment():
         print(f'EXPERIMENT {i}/{len(hyperparameter_sets)}')
         print(f'{"#"*60}')
 
-        # train model, may need to increase epochs/ batches
+        # train model, may need to modify epochs
         cv_summary, fold_results, saved_models = train_model_with_cv(
-            X_train, y_train, hyperparams, n_folds=4, epochs=50, batch_size=32
+            X_train, y_train, hyperparams, n_folds=4, epochs=50
         )
 
         results.append({
@@ -46,7 +49,7 @@ def run_experiment():
             'saved_models': saved_models
         })
 
-    print(f'\n{"#"*60}')  # print final comparison
+    print(f'\n{"#"*60}')
     print('FINAL COMPARISON')
     print(f'{"#"*60}')
 
@@ -56,8 +59,11 @@ def run_experiment():
         print(f'\nExperiment {i}:')
         print(f'Tiles: {hyperparams["tile_h"]}x{hyperparams["tile_w"]}')
         print(f'Overlap: {hyperparams["overlap"]}, Entropy: {hyperparams["entropy_threshold"]}')
+        print(f'Classification threshold: {hyperparams["classification_threshold"]}')
         print(f'Architecture: {hyperparams["architecture"]}')
-        print(f'CV Accuracy: {cv_summary["accuracy_mean"]:.4f} ± {cv_summary["accuracy_std"]:.4f}')
-        print(f'CV F1: {cv_summary["f1_mean"]:.4f} ± {cv_summary["f1_std"]:.4f}')
+        print(f'Tile CV Accuracy: {cv_summary["tile_accuracy_mean"]:.4f}')
+        print(f'Img CV Accuracy: {cv_summary["img_accuracy_mean"]:.4f}')
+        print(f'Tile CV F1: {cv_summary["tile_f1_mean"]:.4f}')
+        print(f'Img CV F1: {cv_summary["img_f1_mean"]:.4f}')
 
     return results

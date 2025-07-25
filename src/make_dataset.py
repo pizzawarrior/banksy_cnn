@@ -11,12 +11,13 @@ def create_tiles_dataset(images, labels, tile_h, tile_w, overlap, entropy_thresh
     '''
     tile_data = []
     tile_labels = []
+    tile_to_image_map = []
 
-    for img, label in zip(images, labels):
+    for img_idx, (img, label) in enumerate(zip(images, labels)):
         tiles = make_img_tiles(img, tile_h, tile_w, overlap)
         img_entropy = get_img_entropy(img)
 
-        assert img_entropy < entropy_threshold, f'Please use an entropy threshold lower than {img_entropy}'
+        assert entropy_threshold < img_entropy, f'Please use an entropy threshold lower than {img_entropy}'
 
         valid_tiles = 0
         for tile in tiles:
@@ -25,8 +26,9 @@ def create_tiles_dataset(images, labels, tile_h, tile_w, overlap, entropy_thresh
                 tile_cnn = prepare_tile_for_cnn(tile, augment=augment)
                 tile_data.append(tile_cnn)
                 tile_labels.append(label)
+                tile_to_image_map.append(img_idx)
                 valid_tiles += 1
 
         print(f'Image with label {label}: {valid_tiles}/{len(tiles)} tiles passed entropy threshold')
 
-    return np.array(tile_data), np.array(tile_labels)
+    return np.array(tile_data), np.array(tile_labels), np.array(tile_to_image_map)

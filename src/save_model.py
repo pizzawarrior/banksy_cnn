@@ -28,11 +28,15 @@ def save_model_with_metadata(model, history, hyperparams, fold, metrics, save_di
     }
 
     metadata_path = os.path.join(save_dir, f'{filename}_metadata.json')
+
+    # NOTE: this overwrites file contents, if file already exists
     with open(metadata_path, 'w') as f:
         json.dump(metadata, f, indent=2)
 
     print(f'Model saved: {model_path}')
-    print(f'Validation accuracy: {metrics["val_accuracy"]:.4f}')
-    print(f'Validation F1: {metrics["val_f1"]:.4f}')
+    print(f'Tile validation accuracy: {metrics["tile_accuracy"]:.4f}')
+    print(f'Tile validation F1: {metrics["tile_f1"]:.4f}')
+    print(f'Image validation accuracy: {metrics["img_accuracy"]:.4f}')
+    print(f'Image validation F1: {metrics["img_f1"]:.4f}')
 
     return model_path, history_path, metadata_path

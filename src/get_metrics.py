@@ -6,7 +6,7 @@ from sklearn.metrics import (accuracy_score,
                              )
 
 
-def calc_metrics(y_test, y_pred, y_pred_proba):
+def calc_metrics(y_test, y_pred, y_pred_proba, data_object):
     '''
     calculate comprehensive classification metrics
     '''
@@ -17,4 +17,5 @@ def calc_metrics(y_test, y_pred, y_pred_proba):
         'recall': recall_score(y_test, y_pred),
         'auc': roc_auc_score(y_test, y_pred_proba)
     }
-    return metrics
+
+    return {data_object + '_' + k: v for k, v in metrics.items()}

@@ -47,7 +47,7 @@ def evaluate_on_test_set(X_test, y_test, hyperparams=None, model_path=None, mode
             print(f'Warning: No valid tiles found for test image with label {true_label}')
 
     # calc image-level metrics
-    classification_threshold = .4
+    classification_threshold = hyperparams.get('classification_threshold', .4)
     image_pred_binary = (np.array(image_predictions) > classification_threshold).astype(int)
     test_metrics = calc_metrics(
         image_true_labels, image_pred_binary, image_predictions

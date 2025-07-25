@@ -13,7 +13,6 @@ def train_model_with_cv(X_train,
                         hyperparams,
                         n_folds=4,
                         epochs=50,
-                        batch_size=16,
                         save_dir='models/saved'):
     '''
     train model using k-fold cross-validation with integrated saving.
@@ -21,7 +20,6 @@ def train_model_with_cv(X_train,
         - tile_h, tile_w, overlap, entropy_threshold, architecture, learning_rate
     '''
 
-    # print hyperparams
     print(f'\n{"="*50}')
     print('Training with hyperparameters:')
     for key, value in hyperparams.items():
@@ -41,14 +39,15 @@ def train_model_with_cv(X_train,
         val_images = [X_train[i] for i in val_idx]
         val_labels = [y_train[i] for i in val_idx]
 
-        X_train_tiles, y_train_tiles = create_tiles_dataset(  # create training tile datasets
+        # create training tile datasets
+        X_train_tiles, y_train_tiles, _ = create_tiles_dataset(
             train_images, train_labels,
             hyperparams['tile_h'], hyperparams['tile_w'],
             hyperparams['overlap'], hyperparams['entropy_threshold'],
             augment=True
         )
-
-        X_val_tiles, y_val_tiles = create_tiles_dataset(  # create validation tile datasets
+        # create validation tile datasets
+        X_val_tiles, y_val_tiles, val_tile_to_image = create_tiles_dataset(
             val_images, val_labels,
             hyperparams['tile_h'], hyperparams['tile_w'],
             hyperparams['overlap'], hyperparams['entropy_threshold'],
@@ -57,7 +56,6 @@ def train_model_with_cv(X_train,
 
         print(f'Training tiles: {X_train_tiles.shape[0]}, Validation tiles: {X_val_tiles.shape[0]}')
 
-        # create and train model
         if hyperparams['architecture'] == '3layer':
             model = cnn_3_layer(
                 hyperparams['tile_h'], hyperparams['tile_w'], hyperparams['learning_rate']
@@ -67,10 +65,10 @@ def train_model_with_cv(X_train,
                 hyperparams['tile_h'], hyperparams['tile_w'], hyperparams['learning_rate']
             )
         else:
-            return f'Model name {hyperparams["architecture"]} is invalid. \
-                Must be either `3layer` or `5layer`.'
+            raise ValueError(f'Model name {hyperparams["architecture"]} is invalid. \
+                Must be either `3layer` or `5layer`.')
 
-        early_stopping = keras.callbacks.EarlyStopping(  # callbacks
+        early_stopping = keras.callbacks.EarlyStopping(
             monitor='val_loss', patience=10, restore_best_weights=True
         )
 
@@ -82,41 +80,64 @@ def train_model_with_cv(X_train,
             X_train_tiles, y_train_tiles,
             validation_data=(X_val_tiles, y_val_tiles),
             epochs=epochs,
-            batch_size=batch_size,
+            batch_size=hyperparams['batch_size'],
             callbacks=[early_stopping, reduce_lr],
             verbose=1
         )
 
         val_pred_proba = model.predict(X_val_tiles)
-        val_pred = (val_pred_proba > 0.5).astype(int).flatten()  # NOTE threshold, can be changed
+        classification_threshold = hyperparams['classification_threshold']
+        # validation classification of each tile NOT image
+        val_pred = (val_pred_proba > classification_threshold).astype(int).flatten()
 
-        val_metrics = calc_metrics(y_val_tiles, val_pred, val_pred_proba.flatten())
-        val_metrics['val_accuracy'] = val_metrics['accuracy']
-        val_metrics['val_f1'] = val_metrics['f1']
-        val_metrics['val_precision'] = val_metrics['precision']
-        val_metrics['val_recall'] = val_metrics['recall']
-        val_metrics['val_auc'] = val_metrics['auc']
+        # track tiles and labels to each image for image level classification
+        # during validation
+        img_preds = {}
+        img_true_labels = {}
 
-        model_paths = save_model_with_metadata(  # save model with pipeline
+        for tile_idx, img_idx in enumerate(val_tile_to_image):
+            if img_idx not in img_preds:
+                img_preds[img_idx] = []
+                img_true_labels[img_idx] = val_labels[img_idx]
+            img_preds[img_idx].append(val_pred_proba[tile_idx][0])
+
+        img_level_preds = []
+        img_level_true_labels = []
+
+        for img_idx in sorted(img_preds.keys()):
+            avg_pred = np.mean(img_preds[img_idx])
+            img_level_preds.append(avg_pred)
+            img_level_true_labels.append(img_true_labels[img_idx])
+
+        img_pred_binary = (np.array(img_level_preds) > classification_threshold).astype(int)
+
+        img_val_metrics = calc_metrics(img_level_true_labels, img_pred_binary, img_level_preds, 'img')
+        tile_val_metrics = calc_metrics(y_val_tiles, val_pred, val_pred_proba.flatten(), 'tile')
+        val_metrics = tile_val_metrics | img_val_metrics  # combine dicts
+
+        model_paths = save_model_with_metadata(
             model, history, hyperparams, fold, val_metrics, save_dir
         )
 
         fold_results.append(val_metrics)
         saved_models.append(model_paths)
 
-    cv_summary = {}  # calc cv summary
+    # display cv summary once validation is done, for tiles and imgs
+    cv_summary = {}
     for metric in ['accuracy', 'f1', 'precision', 'recall', 'auc']:
-        values = [fold[metric] for fold in fold_results]
-        cv_summary[f'{metric}_mean'] = np.mean(values)
-        cv_summary[f'{metric}_std'] = np.std(values)
+        tile_values = [fold['tile_' + metric] for fold in fold_results]
+        cv_summary[f'tile_{metric}_mean'] = np.mean(tile_values)
+        img_values = [fold['img_' + metric] for fold in fold_results]
+        cv_summary[f'img_{metric}_mean'] = np.mean(img_values)
 
     print(f'\n{"="*50}')
     print('Cross-Validation Results:')
 
     for metric in ['accuracy', 'f1', 'precision', 'recall', 'auc']:
-        mean_val = cv_summary[f'{metric}_mean']
-        std_val = cv_summary[f'{metric}_std']
-        print(f'{metric}: {mean_val:.4f} ± {std_val:.4f}')
+        tile_mean_val = cv_summary[f'tile_{metric}_mean']
+        print(f'{metric}: {tile_mean_val:.4f}')
+        img_mean_val = cv_summary[f'img_{metric}_mean']
+        print(f'{metric}: {img_mean_val:.4f}')
     print(f'{"="*50}')
 
     return cv_summary, fold_results, saved_models
