@@ -25,11 +25,19 @@ def evaluate_on_test_set(X_test, y_test, hyperparams=None, model_path=None, mode
     image_predictions = []
     image_true_labels = []
 
+    # TODO: delete me ******
+    tile_predictions = []
+
     for img, true_label in zip(X_test, y_test):
         tiles = make_img_tiles(img, hyperparams['tile_h'], hyperparams['tile_w'], hyperparams['overlap'])
         img_entropy = get_img_entropy(img)
 
-        tile_predictions = []
+        # TODO: FOR EACH IMAGE add a print statement to show how many tiles out of total tiles
+        # made it through.
+        # print {image index number}: image prediction, image true label
+
+        # TODO: uncomment me
+        # tile_predictions = []
         for tile in tiles:
             tile_entropy = get_img_entropy(tile)
             if tile_entropy >= img_entropy - hyperparams['entropy_threshold']:
@@ -39,7 +47,7 @@ def evaluate_on_test_set(X_test, y_test, hyperparams=None, model_path=None, mode
                 tile_predictions.append(pred)
 
         if tile_predictions:
-            # average tile predictions for final image prediction
+            # average tile predictions for final image classification
             image_pred = np.mean(tile_predictions)
             image_predictions.append(image_pred)
             image_true_labels.append(true_label)
@@ -50,7 +58,7 @@ def evaluate_on_test_set(X_test, y_test, hyperparams=None, model_path=None, mode
     classification_threshold = hyperparams.get('classification_threshold', .4)
     image_pred_binary = (np.array(image_predictions) > classification_threshold).astype(int)
     test_metrics = calc_metrics(
-        image_true_labels, image_pred_binary, image_predictions
+        image_true_labels, image_pred_binary, image_predictions, 'img'
     )
 
     print('\nTest Set Results (Image-level):')
@@ -58,4 +66,6 @@ def evaluate_on_test_set(X_test, y_test, hyperparams=None, model_path=None, mode
     for metric, value in test_metrics.items():
         print(f'{metric}: {value:.4f}')
 
-    return test_metrics, image_predictions, image_true_labels
+    # experimenting ONLY - TODO: DELETE tile_predictions
+
+    return test_metrics, image_predictions, image_true_labels, tile_predictions

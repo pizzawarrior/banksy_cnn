@@ -85,10 +85,10 @@ def train_model_with_cv(X_train,
             verbose=1
         )
 
-        val_pred_proba = model.predict(X_val_tiles)
+        tile_val_pred_proba = model.predict(X_val_tiles)
         classification_threshold = hyperparams['classification_threshold']
         # validation classification of each tile NOT image
-        val_pred = (val_pred_proba > classification_threshold).astype(int).flatten()
+        tile_val_pred = (tile_val_pred_proba > classification_threshold).astype(int).flatten()
 
         # track tiles and labels to each image for image level classification
         # during validation
@@ -99,7 +99,7 @@ def train_model_with_cv(X_train,
             if img_idx not in img_preds:
                 img_preds[img_idx] = []
                 img_true_labels[img_idx] = val_labels[img_idx]
-            img_preds[img_idx].append(val_pred_proba[tile_idx][0])
+            img_preds[img_idx].append(tile_val_pred_proba[tile_idx][0])
 
         img_level_preds = []
         img_level_true_labels = []
@@ -112,7 +112,7 @@ def train_model_with_cv(X_train,
         img_pred_binary = (np.array(img_level_preds) > classification_threshold).astype(int)
 
         img_val_metrics = calc_metrics(img_level_true_labels, img_pred_binary, img_level_preds, 'img')
-        tile_val_metrics = calc_metrics(y_val_tiles, val_pred, val_pred_proba.flatten(), 'tile')
+        tile_val_metrics = calc_metrics(y_val_tiles, tile_val_pred, tile_val_pred_proba.flatten(), 'tile')
         val_metrics = tile_val_metrics | img_val_metrics  # combine dicts
 
         model_paths = save_model_with_metadata(
