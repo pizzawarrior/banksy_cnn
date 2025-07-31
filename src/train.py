@@ -3,7 +3,7 @@ from sklearn.model_selection import StratifiedKFold
 from tensorflow import keras
 from src.make_dataset import create_tiles_dataset
 from src.save_model import save_model_with_metadata
-from src.evaluate import calc_metrics
+from src.evaluate import get_metrics
 from models.architectures.cnn_3_layer import cnn_3_layer
 from models.architectures.cnn_5_layer import cnn_5_layer
 
@@ -17,7 +17,8 @@ def train_model_with_cv(X_train,
     '''
     train model using k-fold cross-validation with integrated saving.
     hyperparams are a dict with:
-        - tile_h, tile_w, overlap, entropy_threshold, architecture, learning_rate
+        - tile_h, tile_w, overlap, entropy_threshold, architecture, learning_rate, batch_size,
+        classification_threshold.
     '''
 
     print(f'\n{"="*50}')
@@ -111,8 +112,8 @@ def train_model_with_cv(X_train,
 
         img_pred_binary = (np.array(img_level_preds) > classification_threshold).astype(int)
 
-        img_val_metrics = calc_metrics(img_level_true_labels, img_pred_binary, img_level_preds, 'img')
-        tile_val_metrics = calc_metrics(y_val_tiles, tile_val_pred, tile_val_pred_proba.flatten(), 'tile')
+        img_val_metrics = get_metrics(img_level_true_labels, img_pred_binary, img_level_preds, 'img')
+        tile_val_metrics = get_metrics(y_val_tiles, tile_val_pred, tile_val_pred_proba.flatten(), 'tile')
         val_metrics = tile_val_metrics | img_val_metrics  # combine dicts
 
         model_paths = save_model_with_metadata(

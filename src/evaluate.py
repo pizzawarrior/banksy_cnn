@@ -3,11 +3,16 @@ from src.model_loader import load_model
 from src.image_tiler import make_img_tiles
 from src.get_entropy import get_img_entropy
 from src.prepare_tiles import prepare_tile_for_cnn
-from src.get_metrics import calc_metrics, show_conf_matrix
+from src.get_metrics import get_metrics, show_conf_matrix
 from src.get_hyperparams import get_hyperparams
 
 
-def evaluate_on_test_set(X_test, y_test, hyperparams=None, model_path=None, model=None):
+def evaluate_on_test_set(X_test,
+                         y_test,
+                         hyperparams=None,
+                         model_path=None,
+                         model=None,
+                         single_img=False):
     '''
     Evaluate a trained model on the test set using tile-level predictions
     averaged to image-level predictions.
@@ -58,8 +63,8 @@ def evaluate_on_test_set(X_test, y_test, hyperparams=None, model_path=None, mode
     # calc image-level metrics
     classification_threshold = hyperparams.get('classification_threshold', .4)
     image_pred_binary = (np.array(image_predictions) > classification_threshold).astype(int)
-    test_metrics = calc_metrics(
-        image_true_labels, image_pred_binary, image_predictions, 'img'
+    test_metrics = get_metrics(
+        image_true_labels, image_pred_binary, image_predictions, 'img', single_img=single_img
     )
 
     print('\nTest Set Results (Image-level):')
@@ -67,9 +72,11 @@ def evaluate_on_test_set(X_test, y_test, hyperparams=None, model_path=None, mode
     for metric, value in test_metrics.items():
         print(f'{metric}: {value:.4f}')
 
-    show_conf_matrix(image_true_labels, image_pred_binary)
+    if single_img is False:
+        # only display conf matrix when we test more than 1 image
+        show_conf_matrix(image_true_labels, image_pred_binary)
+        return test_metrics, image_pred_binary, image_true_labels
 
-    # experimenting ONLY; use for single image testing
-    # return test_metrics, image_predictions, image_true_labels, tile_predictions
-
-    return test_metrics, image_predictions, image_true_labels
+    # we want tile preds for a single image test
+    else:
+        return test_metrics, image_pred_binary, image_true_labels, tile_predictions

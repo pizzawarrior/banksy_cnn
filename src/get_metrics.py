@@ -9,7 +9,7 @@ from sklearn.metrics import (accuracy_score,
                              )
 
 
-def calc_metrics(y_test, y_pred, y_pred_proba, data_object):
+def get_metrics(y_test, y_pred, y_pred_proba, data_object, single_img=False):
     '''
     calculate comprehensive classification metrics
     data_object == 'tile' or 'img'
@@ -24,15 +24,17 @@ def calc_metrics(y_test, y_pred, y_pred_proba, data_object):
         'f1': f1_score(y_test, y_pred),
         'precision': precision_score(y_test, y_pred),
         'recall': recall_score(y_test, y_pred),
-        'auc': roc_auc_score(y_test, y_pred_proba)  # TODO: comment me out for testing 1 image
     }
+
+    if single_img is False:
+        metrics.update({'auc': roc_auc_score(y_test, y_pred_proba)})
 
     return {data_object + '_' + k: v for k, v in metrics.items()}
 
 
 def show_conf_matrix(y_test, y_pred):
     '''
-    Create and display conf matrix for testing
+    create and display conf matrix for testing
     '''
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(cm)
