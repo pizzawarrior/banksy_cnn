@@ -6,6 +6,7 @@ from src.split_data import split_data_train_test
 def run_experiment():
     '''
     run a complete experiment with different hyperparameter sets FOR TRAINING.
+    currently set up for trying 3 different models at a time
     returns a list of dictionaries of model metadata and training metrics.
     '''
     image_list, labels = get_images('images')
@@ -19,8 +20,8 @@ def run_experiment():
         #     'classification_threshold': .4
         # },
         {
-            'tile_h': 200, 'tile_w': 200, 'overlap': 0.6, 'entropy_threshold': 2.5,
-            'architecture': '3layer', 'learning_rate': 0.001, 'batch_size': 32,
+            'tile_h': 200, 'tile_w': 200, 'overlap': 0.5, 'entropy_threshold': 1.5,
+            'architecture': '5layer', 'learning_rate': 0.001, 'batch_size': 64,
             'classification_threshold': .4
         },
         # {

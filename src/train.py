@@ -12,7 +12,7 @@ def train_model_with_cv(X_train,
                         y_train,
                         hyperparams,
                         n_folds=4,
-                        epochs=50,
+                        epochs=60,
                         save_dir='models/saved'):
     '''
     train model using k-fold cross-validation with integrated saving.
@@ -125,9 +125,9 @@ def train_model_with_cv(X_train,
     # display cv summary once validation is done, for tiles and imgs
     cv_summary = {}
     for metric in ['accuracy', 'f1', 'precision', 'recall', 'auc']:
-        tile_values = [fold['tile_' + metric] for fold in fold_results]
+        tile_values = [fold[f'tile_{metric}'] for fold in fold_results]
         cv_summary[f'tile_{metric}_mean'] = np.mean(tile_values)
-        img_values = [fold['img_' + metric] for fold in fold_results]
+        img_values = [fold[f'img_{metric}'] for fold in fold_results]
         cv_summary[f'img_{metric}_mean'] = np.mean(img_values)
 
     print(f'\n{"="*50}')

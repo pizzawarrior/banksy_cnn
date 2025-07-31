@@ -3,7 +3,7 @@ from src.model_loader import load_model
 from src.image_tiler import make_img_tiles
 from src.get_entropy import get_img_entropy
 from src.prepare_tiles import prepare_tile_for_cnn
-from src.get_metrics import calc_metrics
+from src.get_metrics import calc_metrics, show_conf_matrix
 from src.get_hyperparams import get_hyperparams
 
 
@@ -25,26 +25,27 @@ def evaluate_on_test_set(X_test, y_test, hyperparams=None, model_path=None, mode
     image_predictions = []
     image_true_labels = []
 
-    # TODO: delete me ******
-    tile_predictions = []
+    tiles_attempted = 0
+    total_tiles_used = 0
+    image_num = 1
 
     for img, true_label in zip(X_test, y_test):
         tiles = make_img_tiles(img, hyperparams['tile_h'], hyperparams['tile_w'], hyperparams['overlap'])
         img_entropy = get_img_entropy(img)
 
-        # TODO: FOR EACH IMAGE add a print statement to show how many tiles out of total tiles
-        # made it through.
-        # print {image index number}: image prediction, image true label
-
-        # TODO: uncomment me
-        # tile_predictions = []
+        tile_predictions = []
         for tile in tiles:
             tile_entropy = get_img_entropy(tile)
+            tiles_attempted += 1
             if tile_entropy >= img_entropy - hyperparams['entropy_threshold']:
                 tile_cnn = prepare_tile_for_cnn(tile, augment=False)
                 tile_cnn = np.expand_dims(tile_cnn, axis=0)  # add batch dim
                 pred = model.predict(tile_cnn, verbose=0)[0][0]
                 tile_predictions.append(pred)
+                total_tiles_used += 1
+
+        print(f'Test Image {image_num}: There were {total_tiles_used}/{tiles_attempted} for testing')
+        image_num += 1
 
         if tile_predictions:
             # average tile predictions for final image classification
@@ -66,6 +67,9 @@ def evaluate_on_test_set(X_test, y_test, hyperparams=None, model_path=None, mode
     for metric, value in test_metrics.items():
         print(f'{metric}: {value:.4f}')
 
-    # experimenting ONLY - TODO: DELETE tile_predictions
+    show_conf_matrix(image_true_labels, image_pred_binary)
 
-    return test_metrics, image_predictions, image_true_labels, tile_predictions
+    # experimenting ONLY; use for single image testing
+    # return test_metrics, image_predictions, image_true_labels, tile_predictions
+
+    return test_metrics, image_predictions, image_true_labels

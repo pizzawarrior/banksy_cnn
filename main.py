@@ -12,7 +12,7 @@ def main():
     # general model fitting:
     # run_experiment()
 
-    model_path = 'models/saved/cnn_200x200_overlap0.5_entropy2.0_3layer_fold4.keras'
+    model_path = 'models/saved/cnn_200x200_overlap0.8_entropy1.0_5layer_fold3.keras'
     image_list, labels = get_images()
     _, X_test, _, y_test = split_data_train_test(image_list, labels)
     evaluate_on_test_set(X_test, y_test, model_path=model_path)

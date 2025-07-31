@@ -5,4 +5,6 @@
 - 27 Not Banksy Images, including forgeries and other artists with similar styles
 - 44 total images used in training, randomly selected
 - 12 total images used for testing, randomly selected.
-- What are the splits of real and fake for training and testing??
+
+To run this project, from the root:
+`python -m main`
