@@ -61,7 +61,8 @@ def evaluate_on_test_set(X_test,
             print(f'Warning: No valid tiles found for test image with label {true_label}')
 
     # calc image-level metrics
-    classification_threshold = hyperparams.get('classification_threshold', .4)
+    classification_threshold = .5
+    # classification_threshold = hyperparams.get('classification_threshold', .4)
     image_pred_binary = (np.array(image_predictions) > classification_threshold).astype(int)
     test_metrics = get_metrics(
         image_true_labels, image_pred_binary, image_predictions, 'img', single_img=single_img
@@ -73,10 +74,8 @@ def evaluate_on_test_set(X_test,
         print(f'{metric}: {value:.4f}')
 
     if single_img is False:
-        # only display conf matrix when we test more than 1 image
-        show_conf_matrix(image_true_labels, image_pred_binary)
         return test_metrics, image_pred_binary, image_true_labels
 
-    # we want tile preds for a single image test
+    # we want tile preds only for a single image test
     else:
         return test_metrics, image_pred_binary, image_true_labels, tile_predictions

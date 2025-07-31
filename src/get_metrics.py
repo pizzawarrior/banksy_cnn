@@ -13,6 +13,7 @@ def get_metrics(y_test, y_pred, y_pred_proba, data_object, single_img=False):
     '''
     calculate comprehensive classification metrics
     data_object == 'tile' or 'img'
+    returns a dict with performance metrics
     '''
 
     # for tracking training performance
