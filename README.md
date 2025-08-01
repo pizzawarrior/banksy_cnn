@@ -7,4 +7,5 @@
 - 12 total images used for testing, randomly selected.
 
 To run this project, from the root:
-`python -m main`
+- activate .venv
+- run `python -m main`

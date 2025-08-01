@@ -40,7 +40,7 @@ def run_experiment():
 
         # train model, may need to modify epochs
         cv_summary, fold_results, saved_models = train_model_with_cv(
-            X_train, y_train, hyperparams, n_folds=4, epochs=50
+            X_train, y_train, hyperparams
         )
 
         results.append({

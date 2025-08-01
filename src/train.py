@@ -11,8 +11,6 @@ from models.architectures.cnn_5_layer import cnn_5_layer
 def train_model_with_cv(X_train,
                         y_train,
                         hyperparams,
-                        n_folds=4,
-                        epochs=60,
                         save_dir='models/saved'):
     '''
     train model using k-fold cross-validation with integrated saving.
@@ -27,6 +25,9 @@ def train_model_with_cv(X_train,
         print(f'{key}: {value}')
     print(f'{"="*50}')
 
+    n_folds = 4
+    epochs = 50
+
     skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=420)
 
     fold_results = []
@@ -40,14 +41,14 @@ def train_model_with_cv(X_train,
         val_images = [X_train[i] for i in val_idx]
         val_labels = [y_train[i] for i in val_idx]
 
-        # create training tile datasets
+        # create training tiles
         X_train_tiles, y_train_tiles, _ = create_tiles_dataset(
             train_images, train_labels,
             hyperparams['tile_h'], hyperparams['tile_w'],
             hyperparams['overlap'], hyperparams['entropy_threshold'],
             augment=True
         )
-        # create validation tile datasets
+        # create validation tiles
         X_val_tiles, y_val_tiles, val_tile_to_image = create_tiles_dataset(
             val_images, val_labels,
             hyperparams['tile_h'], hyperparams['tile_w'],
@@ -136,9 +137,9 @@ def train_model_with_cv(X_train,
 
     for metric in ['accuracy', 'f1', 'precision', 'recall', 'auc']:
         tile_mean_val = cv_summary[f'tile_{metric}_mean']
-        print(f'{metric}: {tile_mean_val:.4f}')
+        print(f'tile_{metric}: {tile_mean_val:.4f}')
         img_mean_val = cv_summary[f'img_{metric}_mean']
-        print(f'{metric}: {img_mean_val:.4f}')
+        print(f'img_{metric}: {img_mean_val:.4f}')
     print(f'{"="*50}')
 
     return cv_summary, fold_results, saved_models
