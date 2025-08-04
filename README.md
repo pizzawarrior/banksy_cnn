@@ -1,6 +1,7 @@
 ## Authentication in Street Art: A Machine Learning Study on Banksy
 
-<red balloon>
+<img src="https://github.com/user-attachments/assets/63a3edf4-90e6-459d-bde9-1003802e68ad" alt="balloon" width="700">  
+
 Fig. 1: Banksy - Girl with Balloon, 2002, London
 
 ### Problem Statement
@@ -8,7 +9,8 @@ In the world of art, authenticity is one of the primary concerns among collector
 
 Part of what makes Banksy’s artwork so successful is how recognizable their artwork is, as a  style, or brand. The consistency in materials, approach, location, subject matter and quality help to identify their work, as much as help others copy it. While prices for Banksy’s work continue to explode astronomically– the current record at auction for a Banksy piece: £18,582,000 (Argun, 2025), the ability to confidently attribute work to the artist is paramount.
 
-<img of fake Banksys>
+<img src="https://github.com/user-attachments/assets/db87bdb2-d6b5-4e67-9457-86aaad8019e9" alt="haul" width="400">  
+
 Fig. 2: A haul of fake Banksy paintings confiscated in Pisa, Italy, November, 2024.  
 
 Just how pervasive are fake Banksys? Since the appearance of Banksy’s first artworks in the 1990s copycats have followed them to every corner of the planet. Both their murals and studio works have been extensively forged causing confusion in the lesser cases, and robbing people of large sums of money in the more extreme cases. In 2021 Banksy’s own website– which ironically exists for purposes of authentication– was hacked, and on it was advertised a new ‘link to an auction site selling an NFT called Great Redistribution of the Climate Change Disaster. After entering a bid far above his rivals the auction was swiftly ended and the funds - in cryptocurrency Ethereum - were sent to the scammer.’ (Tidy, 2021). The price? $336,000. And just recently, a large criminal ring spanning several cities across multiple countries was busted in Italy for counterfeiting the works of famous artists, with a market value of $215,000,000. Among them were a vast trove of counterfeit Banksys. “I confirm that I helped check more than 2,000 fake Banksy works with the Pisa prosecutor” (Harris, 2024), said the Italian art historian, Stefano Antonelli.  
@@ -17,7 +19,8 @@ The problem of reliably authenticating Banksy artworks has historically fallen o
 
 Reliably attributing artworks to Banksy is fraught with several unique challenges. In previous examples of applying ML to artworks, the models are able to focus on a confined problem space that contains only the artwork itself, and nothing else. This allows them to ‘learn’ and generalize to new images with high accuracy. However, in the case of Banksy, their murals are part of their environment, and often play off of existing features. Documentation of the murals includes cars in the background, people walking by in the foreground, architectural elements, and an overall much more dynamic pictorial space. While some of these features may seem extraneous, and might be easily classified as ‘extra noise,’ they are in fact some of the very things that make a Banksy piece recognizable. Not only is their imagery of a particular style, but the context follows a pattern too, which is of great importance in determining authenticity.  
 
-<sand castle>
+<img src="https://github.com/user-attachments/assets/5393a754-81aa-46b4-8b08-914871a170d1" alt="sand castle" width="600">  
+
 Fig. 3: Banksy, 2021, Lowestoft UK. This mural depicts Banksy’s incorporation of the environment into the artwork.  
 
 Incorporating the environment into the problem space significantly increases its complexity. Banksy's artwork encompasses a diverse array of styles and formats– from text-only pieces and subtle, easily missed images to bold black stencils and vibrant full-color compositions. These works appear in a wide range of settings, from dense urban landscapes to jungle walls and remote mud-brick structures in Mali. When it comes to building a dataset, the number of available murals is limited. While no official count exists, estimates suggest there are only several hundred to around 1,000 that have been created– relatively small for training a robust machine learning model.
@@ -27,7 +30,8 @@ One of the biggest challenges this project faced was reconciling the fact that i
 ### Methodology
 Of the limited options available for compiling a dataset containing both authentic and inauthentic Banksy works, I weighed building a web-scraper, but that was quickly dismissed as impractical due to concerns of polluting the ‘authentic’ pool with inauthentic images. Instead, I opted for a more selective approach out of the desire to collect as many different kinds of Banksy murals as possible. In order to authenticate each Banksy work I used several resources, including Banksy’s own Instagram account, their website, and a crowd sourced website, ‘Banksy Explained’. To source both fraudulent and non-Banksy artworks I used a combination of Google searching and news reports. When collecting non-Banksy work, I incorporated documented forgeries, as well as works from similar artists, such as the Norwegian street artist ‘Dot Dot Dot’.
 
-<dot dot>
+<img src="https://github.com/user-attachments/assets/ac03a5cb-0fa5-428c-9968-7109d3e75146" alt="dotdotdot" width="700">  
+
 Fig 4: Artist- Dot Dot Dot. Stavenger, Norway, 2014. This shows the similarity in approach, environment, and style as that of Banksy.  
 
 With the intent of using a combination of data augmentation strategies to expand the usable data, such as image rotations and tiling with overlap, I arrived at a dataset with 56 total images: 29 authentic Banksys, and 27 non-Banksys. The dataset was split into 80% for training and validation, and 20% for testing. The testing dataset consisted of 12 images, with balanced classes: 6 Banksys and 6 non-Banksys. For training and validation I used 4-fold cross validation, and recorded training and validation metrics for each epoch, for each fold, as well as averages over all folds. A model was saved at each fold, which could then be used for testing in the future.  
@@ -58,12 +62,11 @@ I built two CNN models with different architectures for this project. The first 
 
 These results came by way of using 200x200 sized tiles, a batch size of 32 tiles, and 50 epochs, with early stopping. The model was able to detect real Banksy images 2/3 times, and not-Banksy images 5/6 times. 1 false-positive out of 12 test images shows that this model has value as a tool in validating authentic artworks.
 
-<training plot>
+<img width="400" alt="train acc" src="https://github.com/user-attachments/assets/1f21e759-3175-4e27-a322-59cd2fbcbdcb" />
+<img width="400" alt="train loss" src="https://github.com/user-attachments/assets/f9f0f053-351c-4613-8dff-933f53285e52" />  
 
-<training plot>
+Fig. 6: These plots show the performance metrics from fold 4/4 of the training process for the selected model. The Loss plot on the right shows that the model begins overfitting around epoch 13, indicating that further tuning may be beneficial. Early stopping prevented the model from continuing beyond epoch 25 of 50 possible epochs.
 
+### Conclusion
+Applying a convolutional neural network to assist in classifying Banksy’s artworks has shown promise as a companion tool alongside existing resources. This project highlights many of the inherent challenges and opportunities for further exploration in tackling such a complex task. Despite the small dataset, we are able to achieve notable results.
 
----
-To run this project, from the root:
-- activate .venv
-- run `python -m main`
