@@ -1,24 +1,67 @@
-## Banksy Image Authentication Using Convolutional Neural Network
-Can we authenticate Banksy's street art using machine learning? Let's find out.
+## Authentication in Street Art: A Machine Learning Study on Banksy
 
-#### Dataset:
-- 29 Authentic Images
-- 27 Not Banksy Images, including forgeries and other artists with similar styles
-- 44 total images used in training, randomly selected
-- 12 total images used for testing, randomly selected. 6 images are attributable to Banksy, and 6 are not.
+<red balloon>
+Fig. 1: Banksy - Girl with Balloon, 2002, London
 
-#### Confusion Matrix for the best 3-layer model:
+### Problem Statement
+In the world of art, authenticity is one of the primary concerns among collectors and historians. This extends to street art, where proving authenticity becomes much more challenging due to the illicitness of the art itself, as street artists prefer to remain in the shadows. Most street artists go by a pseudonym, yet remain anonymous to avoid legal repercussions. While little is known about ‘Banksy’, an internationally recognised street artist based out of England (Wikipedia,) the popularity and the rising value of their artwork has encouraged no shortage of imitators and forgeries. With the artist remaining anonymous, the burden of proof of authenticity has fallen mostly on the internet and those most familiar with their body of work to provide a sort of crowd-sourced validation. 
+
+Part of what makes Banksy’s artwork so successful is how recognizable their artwork is, as a  style, or brand. The consistency in materials, approach, location, subject matter and quality help to identify their work, as much as help others copy it. While prices for Banksy’s work continue to explode astronomically– the current record at auction for a Banksy piece: £18,582,000 (Argun, 2025), the ability to confidently attribute work to the artist is paramount.
+
+<img of fake Banksys>
+Fig. 2: A haul of fake Banksy paintings confiscated in Pisa, Italy, November, 2024.  
+
+Just how pervasive are fake Banksys? Since the appearance of Banksy’s first artworks in the 1990s copycats have followed them to every corner of the planet. Both their murals and studio works have been extensively forged causing confusion in the lesser cases, and robbing people of large sums of money in the more extreme cases. In 2021 Banksy’s own website– which ironically exists for purposes of authentication– was hacked, and on it was advertised a new ‘link to an auction site selling an NFT called Great Redistribution of the Climate Change Disaster. After entering a bid far above his rivals the auction was swiftly ended and the funds - in cryptocurrency Ethereum - were sent to the scammer.’ (Tidy, 2021). The price? $336,000. And just recently, a large criminal ring spanning several cities across multiple countries was busted in Italy for counterfeiting the works of famous artists, with a market value of $215,000,000. Among them were a vast trove of counterfeit Banksys. “I confirm that I helped check more than 2,000 fake Banksy works with the Pisa prosecutor” (Harris, 2024), said the Italian art historian, Stefano Antonelli.  
+
+The problem of reliably authenticating Banksy artworks has historically fallen on a hodge podge of social media, local news outlets, gallerists, and self-prescribed Banksy experts, all weighing in each time a new ‘Banksy’ artwork appears around the globe. This has essentially devolved into a shouting match, necessitating a more centralized authority. Banksy has made attempts to resolve this with their own social media accounts, and the current accepted authority appears to be a website that people can submit artworks in question to, ‘the only body authorised to authenticate Banksy’s art’ (Pest Control Office), and receive a response about artworks in question. However, there are no images published on this website, and it seems to be oriented towards authenticating Banksy prints, not his broader oeuvre. In terms of validating Banksy’s public artworks, often referred to as ‘murals,’ the most reliable resource I have found is the unofficial and unauthorized website, Banksy Explained. While this site is a great resource, it still leaves much to be desired. Modern problems call for modern solutions– Is this something that machine learning can help us with?  
+
+Reliably attributing artworks to Banksy is fraught with several unique challenges. In previous examples of applying ML to artworks, the models are able to focus on a confined problem space that contains only the artwork itself, and nothing else. This allows them to ‘learn’ and generalize to new images with high accuracy. However, in the case of Banksy, their murals are part of their environment, and often play off of existing features. Documentation of the murals includes cars in the background, people walking by in the foreground, architectural elements, and an overall much more dynamic pictorial space. While some of these features may seem extraneous, and might be easily classified as ‘extra noise,’ they are in fact some of the very things that make a Banksy piece recognizable. Not only is their imagery of a particular style, but the context follows a pattern too, which is of great importance in determining authenticity.  
+
+<sand castle>
+Fig. 3: Banksy, 2021, Lowestoft UK. This mural depicts Banksy’s incorporation of the environment into the artwork.  
+
+Incorporating the environment into the problem space significantly increases its complexity. Banksy's artwork encompasses a diverse array of styles and formats– from text-only pieces and subtle, easily missed images to bold black stencils and vibrant full-color compositions. These works appear in a wide range of settings, from dense urban landscapes to jungle walls and remote mud-brick structures in Mali. When it comes to building a dataset, the number of available murals is limited. While no official count exists, estimates suggest there are only several hundred to around 1,000 that have been created– relatively small for training a robust machine learning model.
+
+One of the biggest challenges this project faced was reconciling the fact that images of Banksy’s murals often contain only a small percentage of actual Banksy artwork. This invites the possibility that an image of an imposter’s artwork– imitating placement and environment– can potentially fool a model on environmental features alone. For example, if an image of a fraudulent work contains just 10% artwork and 90% environment, but the environment is consistent with Banksy’s artworks, the potential for the artwork to be incorrectly classified by the model as authentic is fairly large.
+
+### Methodology
+Of the limited options available for compiling a dataset containing both authentic and inauthentic Banksy works, I weighed building a web-scraper, but that was quickly dismissed as impractical due to concerns of polluting the ‘authentic’ pool with inauthentic images. Instead, I opted for a more selective approach out of the desire to collect as many different kinds of Banksy murals as possible. In order to authenticate each Banksy work I used several resources, including Banksy’s own Instagram account, their website, and a crowd sourced website, ‘Banksy Explained’. To source both fraudulent and non-Banksy artworks I used a combination of Google searching and news reports. When collecting non-Banksy work, I incorporated documented forgeries, as well as works from similar artists, such as the Norwegian street artist ‘Dot Dot Dot’.
+
+<dot dot>
+Fig 4: Artist- Dot Dot Dot. Stavenger, Norway, 2014. This shows the similarity in approach, environment, and style as that of Banksy.  
+
+With the intent of using a combination of data augmentation strategies to expand the usable data, such as image rotations and tiling with overlap, I arrived at a dataset with 56 total images: 29 authentic Banksys, and 27 non-Banksys. The dataset was split into 80% for training and validation, and 20% for testing. The testing dataset consisted of 12 images, with balanced classes: 6 Banksys and 6 non-Banksys. For training and validation I used 4-fold cross validation, and recorded training and validation metrics for each epoch, for each fold, as well as averages over all folds. A model was saved at each fold, which could then be used for testing in the future.  
+
+Each image was divided into same-sized tiles using the Salient Slices technique (Frank et al., 2020). This allows images of different sizes to be used without the need for cropping them to the same dimensions– a typical requirement for machine learning models– greatly reducing the preprocessing steps, and vastly increasing the data pool. This effectively splits a single image into anywhere from 30-150 new images, depending on the tile size, overlap, and rotation strategy. I experimented with a range of tile sizes from 100x100px up to 250x250px, (limited by the smallest dimension of one of the images.) For overlap, I also experimented with a range of percentages from 20% to 90%. Tiles were randomly selected for rotation, using a range of rotation options including 90°, vertical axis, and horizontal axis. Because so many tiles can be generated for each image, the Salient Slices technique also introduces a criteria for tile selection, out of an attempt to weed out tiles that contain little information. This process requires calculating the entropy of both the parent image, using Shannon Entropy with a base-2 log, and then doing the same for each subsequent candidate tile.  
+
+Shannon Entropy:  
+$H(X) = -\sum_{x\in X}p(x)\ log(p(x))$
+
+The entropy of an image, X, essentially corresponds to the amount of visual information contained within. By calculating the probabilities of each pixel value, p(x)– a 2-dimensional 8-bit grayscale image can have a range of pixel values from [0..255]– and taking the negative sum of all of the probabilities, we arrive at a single entropy value, H(X). This value is then used to filter which tiles are allowed to contribute to the dataset or not. In Salient Slices if the candidate tile’s entropy is greater than or equal to the parent image’s entropy, then the image is added. The paper’s authors also modified their approach by relaxing the criterion to: (tile_entropy >= image_entropy - 1%) with good results. In my application I found that too many tiles were being rejected using the same criterion, so I expanded my acceptance threshold to 20%. This means that roughly 80% of the total tiles were admitted. The same tiling and entropy strategy was used for the testing images as well, although none of the test tiles were rotated, in order to simulate a ‘real world’ scenario.  
+
+In a training and validation experiment starting with 44 total images, a tile size of 200x200, and 80% overlap, a dataset was created with a total of 5,752 tiles. 4,314 of those were used for training, and 1,438 images for validation. Class balance is maintained throughout each phase of training, validation, and testing via the StratifiedKFold class from the scikit-learn library. The images are shuffled, and a random state is used to enforce consistent results across different model builds.  
+
+When selecting an appropriate model for this application, several options were evaluated. Initially, I leaned toward simpler models well-suited for sparse datasets, such as Support Vector Machines (SVM) or K-Nearest Neighbors (KNN), and considered dimensionality reduction techniques like Principal Component Analysis (PCA). However, further investigation into image classification pointed me toward convolutional neural networks (CNNs), which have demonstrated exceptional accuracy in this domain. Adopting a CNN also addressed the issue of requiring uniform image sizes; by using smaller tiles, the model could still effectively capture spatial patterns. Unlike distance-based approaches such as SVM or KNN, which can be misled by redundant or highly correlated data, CNNs benefit from overlapping tiles by learning through spatial redundancy.  
+
+I built two CNN models with different architectures for this project. The first consisted of 3 layers, and the second had 5. Both models utilized dropout layers, batch normalization, and max pooling. The learning rate for both was set to .001, and I used sigmoid activation, the Adam optimizer, and a binary cross-entropy loss function. Because I’m limited in terms of hardware and these models can be fairly computationally demanding– generally requiring access to an external GPU– I had to get a little scrappy. All images were converted to grayscale prior to training, and I utilized mini-batch gradient descent, thus reducing both the memory load and requisite compute. Training the 5-layer model on an M1 Macbook with 16GB RAM using the CPU was initially taking upwards of 1 hour, which was not viable. After implementing the tensorflow-metal plugin which accesses my machine’s built-in GPU, training time for the same model dropped to under 4 minutes 30 seconds.  
+
+### Results
+##### Confusion Matrix for the best 3-layer model:
 <img width="500" alt="conf matrix" src="https://github.com/user-attachments/assets/82ecbd72-2a02-40c4-8f03-35a01a387876" />
 
-#### Best 3-layer model performance:
+##### Best 3-layer model performance:
 - Accuracy: 75%
 - F1: 73%
 - Precision: 80%
 - Recall: 67%
 - AUC: 83%
 
-These results indicate that the model was able to detect real Banksy images 2/3 times, and not-Banksy images 5/6 times.  
-1 false positive out of 12 test images shows that this model has value as a tool in validating authentic artworks.
+These results came by way of using 200x200 sized tiles, a batch size of 32 tiles, and 50 epochs, with early stopping. The model was able to detect real Banksy images 2/3 times, and not-Banksy images 5/6 times. 1 false-positive out of 12 test images shows that this model has value as a tool in validating authentic artworks.
+
+<training plot>
+
+<training plot>
+
 
 ---
 To run this project, from the root:
