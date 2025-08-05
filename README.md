@@ -68,5 +68,5 @@ These results came by way of using 200x200 sized tiles, a batch size of 32 tiles
 Fig. 6: These plots show the performance metrics from fold 4/4 of the training process for the selected model. The Loss plot on the right shows that the model begins overfitting around epoch 13, indicating that further tuning may be beneficial. Early stopping prevented the model from continuing beyond epoch 25 of 50 possible epochs.
 
 ### Conclusion
-Applying a convolutional neural network to assist in classifying Banksy’s artworks has shown promise as a companion tool alongside existing resources. This project highlights many of the inherent challenges and opportunities for further exploration in tackling such a complex task. Despite the small dataset, we are able to achieve notable results.
+Applying a convolutional neural network to assist in classifying Banksy’s artworks has shown promise as a companion tool alongside existing resources. This project highlights many of the inherent challenges and opportunities for further exploration in tackling such a complex task. Despite these limitations and such a small dataset, we are able to achieve notable results.
 
