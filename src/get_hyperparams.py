@@ -4,8 +4,11 @@ import re
 
 def get_hyperparams(model_path):
     assert isinstance(model_path, str), 'Model path must be a string'
+
     # extract the filename without the extension
-    match = re.match(r'(.*?)(?:\.keras|\.h5)$', model_path)
+    pattern = r'(.*?)(?:\.keras|\.h5)$'
+    match = re.match(pattern, model_path)
+
     if not match:
         raise ValueError('Model path must be of type .keras or .h5')
 

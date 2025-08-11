@@ -1,13 +1,14 @@
 from src.data_loader import get_images
-from src.train import train_model_with_cv
+from src.train_cv import train_model_with_cv
 from src.split_data import split_data_train_test
 
 
 def run_experiment():
     '''
-    run a complete experiment with different hyperparameter sets FOR TRAINING.
-    currently set up for trying 3 different models at a time
-    returns a list of dictionaries of model metadata and training metrics.
+    run a complete experiment with different hyperparameter sets for CV TRAINING.
+    currently set up for building 3 different models at a time.
+    saves a model, the metadata, and history.
+    returns a list of dictionaries of model metadata and training/ validation metrics.
     '''
     image_list, labels = get_images('images')
     X_train, _, y_train, _ = split_data_train_test(image_list, labels)
@@ -38,7 +39,6 @@ def run_experiment():
         print(f'EXPERIMENT {i}/{len(hyperparameter_sets)}')
         print(f'{"#"*60}')
 
-        # train model, may need to modify epochs
         cv_summary, fold_results, saved_models = train_model_with_cv(
             X_train, y_train, hyperparams
         )

@@ -2,24 +2,33 @@ import os
 import json
 
 
-def save_model_with_metadata(model, history, hyperparams, fold, metrics, save_dir='models/saved'):
+def save_model_with_metadata(model, history, hyperparams, metrics, save_dir, fold=None):
     '''
     save model with comprehensive metadata and training history.
+    works for both cv models trained on each fold, as well as fully trained models.
     '''
 
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
-    filename = f'cnn_{hyperparams["tile_h"]}x{hyperparams["tile_w"]}_overlap{hyperparams["overlap"]:.1f}_entropy{hyperparams["entropy_threshold"]:.1f}_{hyperparams["architecture"]}_fold{fold}'
+    if fold is not None:
+        # cross-validate models
+        filename = f'cnn_{hyperparams["tile_h"]}x{hyperparams["tile_w"]}_overlap{hyperparams["overlap"]:.1f}_entropy{hyperparams["entropy_threshold"]:.1f}_{hyperparams["architecture"]}_fold{fold}'
+
+    else:
+        # fully trained models
+        filename = f'cnn_{hyperparams["tile_h"]}x{hyperparams["tile_w"]}_overlap{hyperparams["overlap"]:.1f}_entropy{hyperparams["entropy_threshold"]:.1f}'
+
     model_path = os.path.join(save_dir, f'{filename}.keras')
     model.save(model_path)
 
-    history_path = os.path.join(save_dir, f'{filename}_history.json')  # save training history
+    history_path = os.path.join(save_dir, f'{filename}_history.json')
     history_dict = {k: [float(v) for v in values] for k, values in history.history.items()}
+
     with open(history_path, 'w') as f:
         json.dump(history_dict, f, indent=2)
 
-    metadata = {  # save metadata and metrics
+    metadata = {
         'hyperparameters': hyperparams,
         'fold': fold,
         'metrics': {k: float(v) for k, v in metrics.items()},

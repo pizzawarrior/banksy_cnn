@@ -11,7 +11,7 @@ from models.architectures.cnn_5_layer import cnn_5_layer
 def train_model_with_cv(X_train,
                         y_train,
                         hyperparams,
-                        save_dir='models/saved'):
+                        save_dir='models/saved/cv_results'):
     '''
     train model using k-fold cross-validation with integrated saving.
     hyperparams are a dict with:
@@ -89,6 +89,7 @@ def train_model_with_cv(X_train,
 
         tile_val_pred_proba = model.predict(X_val_tiles)
         classification_threshold = hyperparams['classification_threshold']
+
         # validation classification of each tile NOT image
         tile_val_pred = (tile_val_pred_proba > classification_threshold).astype(int).flatten()
 
@@ -118,7 +119,7 @@ def train_model_with_cv(X_train,
         val_metrics = tile_val_metrics | img_val_metrics  # combine dicts
 
         model_paths = save_model_with_metadata(
-            model, history, hyperparams, fold, val_metrics, save_dir
+            model, history, hyperparams, val_metrics, save_dir, fold
         )
 
         fold_results.append(val_metrics)
@@ -134,12 +135,12 @@ def train_model_with_cv(X_train,
 
     print(f'\n{"="*50}')
     print('Cross-Validation Results:')
-
     for metric in ['accuracy', 'f1', 'precision', 'recall', 'auc']:
         tile_mean_val = cv_summary[f'tile_{metric}_mean']
         print(f'tile_{metric}: {tile_mean_val:.4f}')
         img_mean_val = cv_summary[f'img_{metric}_mean']
         print(f'img_{metric}: {img_mean_val:.4f}')
+
     print(f'{"="*50}')
 
     return cv_summary, fold_results, saved_models
