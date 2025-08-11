@@ -1,4 +1,5 @@
 import os
+import json
 import matplotlib.pyplot as plt
 from src.data_loader import get_images
 from src.get_metadata import get_metadata
@@ -40,8 +41,7 @@ def train_top_models():
     train the top n models, save the metrics.
     '''
 
-    # def _get_metrics(dir_path='models/saved/cv_results'):
-    def _get_metrics(dir_path='models/saved'):
+    def _get_metrics(dir_path='models/saved/cv_results'):
         metadata_dict = {}
 
         # find all metadata paths, parse the files, and add the metrics to a dict
@@ -54,7 +54,7 @@ def train_top_models():
             return f'There are no metadata files in the current directory: {dir_path}'
         return metadata_dict
 
-    def _get_top_n_configs(metadata_dict, n=5):
+    def _get_top_n_models(metadata_dict, n=5):
         ranked_models = dict(sorted(
             metadata_dict.items(),
             key=lambda model: (
@@ -65,24 +65,36 @@ def train_top_models():
         ))
 
         unique_models = {}
-        i = 1
-        print(f'The top {n} model paths, in order, are:')
+        seen_configs = set()
+        i = 0
+        print(f'The top {n} models, in order, are:')
         for k, v in ranked_models.items():
-            # '#_metadata.json' = 15 chars.
-            if k[:-15] not in unique_models:
+            trimmed_name = k[:-15]  # '#_metadata.json' = 15 chars
+            if trimmed_name not in seen_configs:
+                seen_configs.add(trimmed_name)
                 unique_models[k] = v
-                print(k[24:])  # this leaves out 'models/saved/cv_results/'
+                print(k[24:])  # this leaves out the path: 'models/saved/cv_results/'
                 i += 1
             if i == n:
                 break
         return unique_models
 
-    # image_list, labels = get_images()
-    # _, X_test, _, y_test = split_data_train_test(image_list, labels)
-    metadata_dict = _get_metrics()
-    top_n_models = _get_top_n_configs(metadata_dict)
+    def _get_metadata_hyperparams(unique_models):
+        '''
+        NOTE: we read from the metadata file so we can delete all cv models!
+        '''
+        hyperparams = []
+        for path in list(unique_models.keys()):
+            with open(path, 'r') as f:
+                data = json.load(f)
+            hyperparams.append(data['hyperparameters'])
+        return hyperparams
 
-    print(top_n_models)
+    # image_list, labels = get_images()
+    # X_train, _, y_train, _ = split_data_train_test(image_list, labels)
+    metadata_dict = _get_metrics()
+    top_n_models = _get_top_n_models(metadata_dict)
+    hyperparameters = _get_metadata_hyperparams(top_n_models)
 
     # Ok, now we can fully train the top 5 models and record the performance
 

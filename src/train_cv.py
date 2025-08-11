@@ -2,10 +2,9 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from tensorflow import keras
 from src.make_dataset import create_tiles_dataset
+from utils.model_builders import model_builders
 from src.save_model import save_model_with_metadata
 from src.evaluate import get_metrics
-from models.architectures.cnn_3_layer import cnn_3_layer
-from models.architectures.cnn_5_layer import cnn_5_layer
 
 
 def train_model_with_cv(X_train,
@@ -18,7 +17,6 @@ def train_model_with_cv(X_train,
         - tile_h, tile_w, overlap, entropy_threshold, architecture, learning_rate, batch_size,
         classification_threshold.
     '''
-
     print(f'\n{"="*50}')
     print('Training with hyperparameters:')
     for key, value in hyperparams.items():
@@ -49,7 +47,7 @@ def train_model_with_cv(X_train,
             augment=True
         )
         # create validation tiles
-        X_val_tiles, y_val_tiles, val_tile_to_image = create_tiles_dataset(
+        X_val_tiles, y_val_tiles, val_tiles_to_image = create_tiles_dataset(
             val_images, val_labels,
             hyperparams['tile_h'], hyperparams['tile_w'],
             hyperparams['overlap'], hyperparams['entropy_threshold'],
@@ -58,17 +56,7 @@ def train_model_with_cv(X_train,
 
         print(f'Training tiles: {X_train_tiles.shape[0]}, Validation tiles: {X_val_tiles.shape[0]}')
 
-        if hyperparams['architecture'] == '3layer':
-            model = cnn_3_layer(
-                hyperparams['tile_h'], hyperparams['tile_w'], hyperparams['learning_rate']
-            )
-        elif hyperparams['architecture'] == '5layer':
-            model = cnn_5_layer(
-                hyperparams['tile_h'], hyperparams['tile_w'], hyperparams['learning_rate']
-            )
-        else:
-            raise ValueError(f'Model name {hyperparams["architecture"]} is invalid. \
-                Must be either `3layer` or `5layer`.')
+        model = model_builders(hyperparams)
 
         early_stopping = keras.callbacks.EarlyStopping(
             monitor='val_loss', patience=10, restore_best_weights=True
@@ -98,7 +86,7 @@ def train_model_with_cv(X_train,
         img_preds = {}
         img_true_labels = {}
 
-        for tile_idx, img_idx in enumerate(val_tile_to_image):
+        for tile_idx, img_idx in enumerate(val_tiles_to_image):
             if img_idx not in img_preds:
                 img_preds[img_idx] = []
                 img_true_labels[img_idx] = val_labels[img_idx]

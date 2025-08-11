@@ -3,6 +3,9 @@ import re
 
 
 def get_hyperparams(model_path):
+    '''
+    TODO: add me to a utils dir
+    '''
     assert isinstance(model_path, str), 'Model path must be a string'
 
     # extract the filename without the extension

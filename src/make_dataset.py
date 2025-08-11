@@ -1,5 +1,5 @@
 import numpy as np
-from src.image_tiler import make_img_tiles
+from src.get_image_tiles import make_img_tiles
 from src.get_entropy import get_img_entropy
 from src.prepare_tiles import prepare_tile_for_cnn
 
@@ -7,7 +7,11 @@ from src.prepare_tiles import prepare_tile_for_cnn
 def create_tiles_dataset(images, labels, tile_h, tile_w, overlap, entropy_threshold, augment=False):
     '''
     create dataset of tiles from images that pass entropy threshold.
-    returns tiles in CNN format (batch, height, width, channels).
+    returns:
+        - tiles in CNN format (batch, height, width, channels).
+        - associated tile labels
+        - a tile-image-map, which stores the index of each parent image for each of the
+        child tiles that is added to the dataset. This is used for image-level metric tracking.
     '''
     tile_data = []
     tile_labels = []

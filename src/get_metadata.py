@@ -3,6 +3,7 @@ import json
 
 def get_metadata(file_path):
     '''
+    TODO: add me to a utils dir
     take metadata file path and parse the json file.
     grab precision, f1, and accuracy from the 'metrics' key.
     return a dict of model performance metrics.

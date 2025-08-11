@@ -1,9 +1,9 @@
 import numpy as np
 from src.model_loader import load_model
-from src.image_tiler import make_img_tiles
+from src.get_image_tiles import make_img_tiles
 from src.get_entropy import get_img_entropy
 from src.prepare_tiles import prepare_tile_for_cnn
-from src.get_metrics import get_metrics, show_conf_matrix
+from src.get_metrics import get_metrics
 from src.get_hyperparams import get_hyperparams
 
 
@@ -16,6 +16,8 @@ def evaluate_on_test_set(X_test,
     '''
     Evaluate a trained model on the test set using tile-level predictions
     averaged to image-level predictions.
+    TODO: is there any reason why we should be testing cv fold models?
+    why not train the full model then test it?...
     '''
     if model is None and model_path is not None:
         model = load_model(model_path)
