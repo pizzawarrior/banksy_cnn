@@ -1,0 +1,14 @@
+{
+  "hyperparameters": {
+    "tile_h": 200,
+    "tile_w": 200,
+    "overlap": 0.6,
+    "entropy_threshold": 2.5,
+    "architecture": "3layer",
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "classification_threshold": 0.4
+  },
+  "model_path": "models/saved/fully_trained/cnn_200x200_overlap0.6_entropy2.5.keras",
+  "history_path": "models/saved/fully_trained/cnn_200x200_overlap0.6_entropy2.5_history.json"
+}

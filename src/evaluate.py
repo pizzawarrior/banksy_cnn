@@ -63,15 +63,13 @@ def evaluate_on_test_set(X_test,
             print(f'Warning: No valid tiles found for test image with label {true_label}')
 
     # calc image-level metrics
-    classification_threshold = .5
-    # classification_threshold = hyperparams.get('classification_threshold', .4)
+    classification_threshold = hyperparams.get('classification_threshold', .5)
     image_pred_binary = (np.array(image_predictions) > classification_threshold).astype(int)
     test_metrics = get_metrics(
-        image_true_labels, image_pred_binary, image_predictions, 'img', single_img=single_img
-    )
+        image_true_labels, image_pred_binary, image_predictions, 'img', single_img=single_img)
 
-    print('\nTest Set Results (Image-level):')
-    print(f'classification-threshold: {classification_threshold}')
+    print('Test Set Results-- Image-level):')
+    print(f'Classification-threshold: {classification_threshold}')
     for metric, value in test_metrics.items():
         print(f'{metric}: {value:.4f}')
 

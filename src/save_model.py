@@ -2,10 +2,16 @@ import os
 import json
 
 
-def save_model_with_metadata(model, history, hyperparams, metrics, save_dir, fold=None):
+def save_model_with_metadata(model,
+                             history,
+                             hyperparams,
+                             save_dir,
+                             metrics=None,
+                             fold=None):
     '''
     save model with comprehensive metadata and training history.
-    works for both cv models trained on each fold, as well as fully trained models.
+    works for both cv models trained on each fold, as well as fully
+    trained models.
     '''
 
     if not os.path.exists(save_dir):
@@ -28,13 +34,22 @@ def save_model_with_metadata(model, history, hyperparams, metrics, save_dir, fol
     with open(history_path, 'w') as f:
         json.dump(history_dict, f, indent=2)
 
+    # this works for both cv and fully trained models
     metadata = {
         'hyperparameters': hyperparams,
-        'fold': fold,
-        'metrics': {k: float(v) for k, v in metrics.items()},
         'model_path': model_path,
         'history_path': history_path
     }
+
+    # add these for cv models that have validation metrics and a fold to save
+    if metrics is not None:
+        metadata['metrics'] = metrics
+        metadata['fold'] = fold
+
+        print(f'Tile validation accuracy: {metrics["tile_accuracy"]:.4f}')
+        print(f'Tile validation F1: {metrics["tile_f1"]:.4f}')
+        print(f'Image validation accuracy: {metrics["img_accuracy"]:.4f}')
+        print(f'Image validation F1: {metrics["img_f1"]:.4f}')
 
     metadata_path = os.path.join(save_dir, f'{filename}_metadata.json')
 
@@ -43,9 +58,5 @@ def save_model_with_metadata(model, history, hyperparams, metrics, save_dir, fol
         json.dump(metadata, f, indent=2)
 
     print(f'Model saved: {model_path}')
-    print(f'Tile validation accuracy: {metrics["tile_accuracy"]:.4f}')
-    print(f'Tile validation F1: {metrics["tile_f1"]:.4f}')
-    print(f'Image validation accuracy: {metrics["img_accuracy"]:.4f}')
-    print(f'Image validation F1: {metrics["img_f1"]:.4f}')
 
     return model_path, history_path, metadata_path

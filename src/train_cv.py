@@ -1,8 +1,7 @@
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
-from tensorflow import keras
 from src.make_dataset import create_tiles_dataset
-from utils.model_builders import model_builders
+from src.utils import model_builders
 from src.save_model import save_model_with_metadata
 from src.evaluate import get_metrics
 
@@ -16,6 +15,10 @@ def train_model_with_cv(X_train,
     hyperparams are a dict with:
         - tile_h, tile_w, overlap, entropy_threshold, architecture, learning_rate, batch_size,
         classification_threshold.
+    returns:
+        - cv_summary: the tile and image validation metric values averaged for each fold.
+        - fold_results: a dict of tile and image validation metrics, including: accuracy, f1, precision, recall.
+        - saved_results: a tuple containing the model path, history path, and metadata path.
     '''
     print(f'\n{"="*50}')
     print('Training with hyperparameters:')
@@ -29,7 +32,7 @@ def train_model_with_cv(X_train,
     skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=420)
 
     fold_results = []
-    saved_models = []
+    saved_results = []
 
     for fold, (train_idx, val_idx) in enumerate(skf.split(X_train, y_train), 1):
         print(f'\n--- Fold {fold}/{n_folds} ---')
@@ -56,15 +59,7 @@ def train_model_with_cv(X_train,
 
         print(f'Training tiles: {X_train_tiles.shape[0]}, Validation tiles: {X_val_tiles.shape[0]}')
 
-        model = model_builders(hyperparams)
-
-        early_stopping = keras.callbacks.EarlyStopping(
-            monitor='val_loss', patience=10, restore_best_weights=True
-        )
-
-        reduce_lr = keras.callbacks.ReduceLROnPlateau(
-            monitor='val_loss', factor=0.5, patience=5, min_lr=1e-7
-        )
+        model, early_stopping, reduce_lr = model_builders(hyperparams)
 
         history = model.fit(
             X_train_tiles, y_train_tiles,
@@ -106,12 +101,12 @@ def train_model_with_cv(X_train,
         tile_val_metrics = get_metrics(y_val_tiles, tile_val_pred, tile_val_pred_proba.flatten(), 'tile')
         val_metrics = tile_val_metrics | img_val_metrics  # combine dicts
 
-        model_paths = save_model_with_metadata(
-            model, history, hyperparams, val_metrics, save_dir, fold
+        result_paths = save_model_with_metadata(
+            model, history, hyperparams, save_dir, val_metrics, fold
         )
 
         fold_results.append(val_metrics)
-        saved_models.append(model_paths)
+        saved_results.append(result_paths)
 
     # display cv summary once validation is done, for tiles and imgs
     cv_summary = {}
@@ -131,4 +126,4 @@ def train_model_with_cv(X_train,
 
     print(f'{"="*50}')
 
-    return cv_summary, fold_results, saved_models
+    return cv_summary, fold_results, saved_results

@@ -12,8 +12,10 @@ from sklearn.metrics import (accuracy_score,
 def get_metrics(y_test, y_pred, y_pred_proba, data_object, single_img=False):
     '''
     calculate comprehensive classification metrics
-    data_object == 'tile' or 'img'
-    returns a dict with performance metrics
+    data_object == 'tile' or 'img'.
+    works for testing a single_img or a full test dataset.
+    returns a dict with performance metrics.
+    if testing on full dataset we also include the roc_auc_score.
     '''
 
     # for tracking training performance
