@@ -35,7 +35,7 @@ def get_metrics(y_test, y_pred, y_pred_proba, data_object, single_img=False):
     return {data_object + '_' + k: v for k, v in metrics.items()}
 
 
-def show_conf_matrix(y_test, y_pred):
+def show_conf_matrix(y_test, y_pred, path_file_model_name, save=False):
     '''
     create and display conf matrix for testing
     '''
@@ -43,3 +43,6 @@ def show_conf_matrix(y_test, y_pred):
     disp = ConfusionMatrixDisplay(cm)
     disp.plot()
     plt.show()
+    if save is True:
+        plt.title = path_file_model_name[1]
+        plt.savefig(''.join(path_file_model_name))

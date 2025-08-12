@@ -4,8 +4,8 @@ from src.data_loader import get_images
 from src.tf_setup import configure_tf
 from src.split_data import split_data_train_test
 from src.evaluate import evaluate_on_test_set
-from src.utils import train_top_models
-# from src.get_metrics import show_conf_matrix
+from src.utils import get_trained_model_paths, get_model_name
+from src.get_metrics import show_conf_matrix
 
 
 def get_best_model():
@@ -16,7 +16,7 @@ def get_best_model():
     pass
 
 
-def test_one_model(model_path, single_img=False):
+def test_one_model(model_path, single_img=False, plot_save_path='plots/confusion_matrices'):
     '''
     TODO: can we add saving to this??? save the test results to the
     metadata file WITHOUT OVERIDING IT.
@@ -27,7 +27,7 @@ def test_one_model(model_path, single_img=False):
     _, X_test, _, y_test = split_data_train_test(image_list, labels)
 
     if single_img is True:
-        test_img = X_test[1] # placeholder:: select your test image
+        test_img = X_test[1]  # placeholder:: select your test image
         plt.imshow(test_img, cmap='gray')  # display image for reference
         plt.show()
         # test_metrics, image_pred_binary, image_true_labels, tile_predictions
@@ -37,7 +37,18 @@ def test_one_model(model_path, single_img=False):
         results = evaluate_on_test_set(X_test, y_test, model_path=model_path, single_img=False)
         test_metrics, image_pred_binary, image_true_labels = results
 
-        # call save_metrics()
+    # call save_metrics()
+
+    file_path_model_name = (plot_save_path, get_model_name(model_path))
+    show_conf_matrix(image_true_labels, image_pred_binary, file_path_model_name, save=True)
+
+
+# delete or move me
+def test_best_models():
+    model_paths = get_trained_model_paths()
+    for model_path in model_paths:
+        test_one_model(model_path)
+    return
 
 
 # TODO: add other IDEAL STATE functions
@@ -95,7 +106,6 @@ def main():
     # show_conf_matrix(image_true_labels, image_pred_binary)
 
     # testing all saved models on the full test set
-    train_top_models()
 
 
 if __name__ == "__main__":
