@@ -9,5 +9,12 @@
     "batch_size": 32
   },
   "model_path": "models/saved/fully_trained/cnn_200x200_overlap0.5_entropy2.0.keras",
-  "history_path": "models/saved/fully_trained/cnn_200x200_overlap0.5_entropy2.0_history.json"
+  "history_path": "models/saved/fully_trained/cnn_200x200_overlap0.5_entropy2.0_history.json",
+  "test_metrics": {
+    "img_accuracy": 0.5,
+    "img_f1": 0.6666666666666666,
+    "img_precision": 0.5,
+    "img_recall": 1.0,
+    "img_auc": 0.8333333333333335
+  }
 }

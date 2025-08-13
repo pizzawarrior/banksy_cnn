@@ -22,11 +22,17 @@ def get_metrics(y_test, y_pred, y_pred_proba, data_object, single_img=False):
     if data_object not in ['img', 'tile']:
         raise ValueError('Data object for calculating performance metrics must be either `tile` or `img`.')
 
+    metric_funcs = {
+        'accuracy': accuracy_score,
+        'f1': f1_score,
+        'precision': precision_score,
+        'recall': recall_score,
+    }
+
     metrics = {
-        'accuracy': accuracy_score(y_test, y_pred),
-        'f1': f1_score(y_test, y_pred),
-        'precision': precision_score(y_test, y_pred),
-        'recall': recall_score(y_test, y_pred),
+        # use zero_division for when we experiment with different thresholds
+        name: func(y_test, y_pred)
+        for name, func in metric_funcs.items()
     }
 
     if single_img is False:
@@ -39,10 +45,16 @@ def show_conf_matrix(y_test, y_pred, path_file_model_name, save=False):
     '''
     create and display conf matrix for testing
     '''
+    fig, ax = plt.subplots()
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(cm)
-    disp.plot()
-    plt.show()
+    disp.plot(ax=ax)
+    ax.set_title(path_file_model_name[1])
+
     if save is True:
-        plt.title = path_file_model_name[1]
-        plt.savefig(''.join(path_file_model_name))
+        plot_path = '/'.join(path_file_model_name)
+        plt.savefig(plot_path.replace('.keras', '.png'))
+        print(f'Confusion Matrix saved to {path_file_model_name[0]}')
+
+    plt.show()
+    plt.close(fig)  # prevent ghost plots

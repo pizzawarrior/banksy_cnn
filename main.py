@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 from src.data_loader import get_images
-# from experiments.run_experiment import run_experiment
+from experiments.run_experiment import run_experiment
 from src.tf_setup import configure_tf
 from src.split_data import split_data_train_test
 from src.evaluate import evaluate_on_test_set
-from src.utils import get_trained_model_paths, get_model_name
+from src.utils import get_trained_model_paths, get_model_name, save_metrics
 from src.get_metrics import show_conf_matrix
 
 
@@ -16,12 +16,12 @@ def get_best_model():
     pass
 
 
-def test_one_model(model_path, single_img=False, plot_save_path='plots/confusion_matrices'):
+def test_one_model(model_path, single_img=False, cm_plot_save_path='plots/confusion_matrices'):
     '''
-    TODO: can we add saving to this??? save the test results to the
-    metadata file WITHOUT OVERIDING IT.
     test one selected model against either the the full test dataset or a single image.
     if single image: assumes image is already part of the `images` dataset.
+    we generate performance metrics and save them to the metadata file.
+    if testing on a full test set we also generate and save a confusion matrix.
     '''
     image_list, labels = get_images()
     _, X_test, _, y_test = split_data_train_test(image_list, labels)
@@ -33,14 +33,15 @@ def test_one_model(model_path, single_img=False, plot_save_path='plots/confusion
         # test_metrics, image_pred_binary, image_true_labels, tile_predictions
         results = evaluate_on_test_set(X_test, y_test, model_path=model_path, single_img=True)
         test_metrics, image_pred_binary, image_true_labels, tile_predictions = results
+        # TODO: should we do anything with tile_predictions?
     else:
         results = evaluate_on_test_set(X_test, y_test, model_path=model_path, single_img=False)
         test_metrics, image_pred_binary, image_true_labels = results
+        file_path_model_name = (cm_plot_save_path, get_model_name(model_path))
+        show_conf_matrix(image_true_labels, image_pred_binary, file_path_model_name, save=True)
 
-    # call save_metrics()
-
-    file_path_model_name = (plot_save_path, get_model_name(model_path))
-    show_conf_matrix(image_true_labels, image_pred_binary, file_path_model_name, save=True)
+    save_metrics(test_metrics, model_path)
+    return
 
 
 # delete or move me
@@ -96,16 +97,17 @@ def main():
     configure_tf()
 
     # model fitting and experimentation:
-    # run_experiment()
+    run_experiment()
 
     # TODO: update this mess
-    # single model testing; full test dataset
+    # single model testing; full test dataset:: THESE ARE CV MODELS:::::
     # # model_path = 'models/saved/cnn_200x200_overlap0.8_entropy1.0_5layer_fold3.keras'  # good model
     # model_path = 'models/saved/cnn_250x250_overlap0.8_entropy1.0_3layer_fold2.keras'  # test (delete)
     # _, image_pred_binary, image_true_labels = test_one_model(model_path, single_img=False)
     # show_conf_matrix(image_true_labels, image_pred_binary)
 
     # testing all saved models on the full test set
+    # test_best_models()
 
 
 if __name__ == "__main__":

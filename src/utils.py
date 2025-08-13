@@ -8,6 +8,20 @@ from src.data_loader import get_images
 from src.split_data import split_data_train_test
 
 
+def load_model(model_path):
+    '''
+    load a saved model using the provided model path.
+    this is used for evaluating a model on test data.
+    '''
+    try:
+        model = keras.models.load_model(model_path)
+        print(f'Model loaded successfully from {model_path}')
+        return model
+    except Exception as e:
+        print(f'Error loading model from {model_path}: {e}')
+        return
+
+
 def model_builders(hyperparams):
     model_options = {
         '3layer': cnn_3_layer,
@@ -72,7 +86,8 @@ def get_saved_metrics(dir_path='models/saved/cv_results'):
     reads the metadata files from cv_results and parse the performance metrics of each cv model.
     create a new dict with the path to the model as the key and {precision, f1, accuracy}
     as the value.
-    returns the dict
+    returns the dict.
+    this is used to locate the best models from the cv_results. likely a single-use function.
     '''
     metadata_dict = {}
 
@@ -93,6 +108,7 @@ def get_top_n_models(metadata_dict, n=5):
     descending order to isolate the top n models.
     ensure that each n model is unique (recall that 4 models with the same config
     are saved for every model), we only want to add one of those to the top n list.
+    this is used to locate the best models from the cv_results. likely a single-use function.
     '''
     ranked_models = dict(sorted(
         metadata_dict.items(),
@@ -122,8 +138,9 @@ def get_top_n_models(metadata_dict, n=5):
 def get_metadata_hyperparams(unique_models):
     '''
     collect the hyperparameters for the top n models so we can train new
-    models with the full dataset using the hyperparams.
+    models with the full dataset using these hyperparams.
     returns a list of dictionaries of hyperparameters for each model.
+    this is used to locate the best models from the cv_results. likely a single-use function.
     TODO: we read from the metadata file so we can delete all cv models!
     '''
     hyperparams = []
@@ -154,7 +171,8 @@ def train_top_models():
 def get_trained_model_paths(dir_path='models/saved/fully_trained'):
     '''
     get all the model paths from the default dir and add to a list.
-    return list.
+    return list. we gather all of them so we can test them.
+    this may be a one-time-use function.
     '''
     model_paths = []
 
@@ -172,18 +190,33 @@ def get_trained_model_paths(dir_path='models/saved/fully_trained'):
     return model_paths
 
 
-def save_metrics(test_metrics, dir_path='models/saved/fully_trained'):
-    pass
-    # metadata_dict = {}
-
-    # with open(file_path, 'r') as f:
-    #     data = json.load(f)
+def save_metrics(test_metrics, model_path):
+    '''
+    parse the provided model_path and format it so we can update the metadata file
+    for the given model and add test metrics. all existing data is retained and untouched.
+    the metadata file is then saved with this new data.
+    NOTE: the key used here for metrics is different than in cv_results. Here we use 'test_metrics'.
+    '''
+    assert '.keras' in model_path, f'Provided model path: {model_path} is in the incorrect format and can not be parsed for file saving.'
+    metadata_path = model_path.replace('.keras', '_metadata.json')
+    try:
+        with open(metadata_path, 'r') as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        print(f'Error: the metadata file path: {metadata_path} was not found.')
+        exit()
+    data['test_metrics'] = test_metrics
+    with open(metadata_path, 'w') as f:
+        json.dump(data, f, indent=2)
+    print('Model metadata file updated successfully with test-metrics.')
 
 
 def get_model_name(model_path):
     '''
     take a relative model path, strip the path, and keep only the model name.
     returns a string for the full model name.
+    this is used to create a title for the confusion matrix when a model is
+    tested.
     '''
     pattern = r'.*\/(.*)'
     match = re.match(pattern, model_path)

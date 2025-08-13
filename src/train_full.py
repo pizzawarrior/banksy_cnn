@@ -1,7 +1,7 @@
 from tensorflow import keras
 from src.make_dataset import create_tiles_dataset
 from src.utils import model_builders
-from src.save_model import save_model_with_metadata
+from src.save_model_with_metadata import save_model_with_metadata
 
 
 def train_full(X_train,

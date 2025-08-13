@@ -10,5 +10,12 @@
     "classification_threshold": 0.4
   },
   "model_path": "models/saved/fully_trained/cnn_250x250_overlap0.8_entropy1.0.keras",
-  "history_path": "models/saved/fully_trained/cnn_250x250_overlap0.8_entropy1.0_history.json"
+  "history_path": "models/saved/fully_trained/cnn_250x250_overlap0.8_entropy1.0_history.json",
+  "test_metrics": {
+    "img_accuracy": 0.5833333333333334,
+    "img_f1": 0.4444444444444444,
+    "img_precision": 0.6666666666666666,
+    "img_recall": 0.3333333333333333,
+    "img_auc": 0.6944444444444444
+  }
 }

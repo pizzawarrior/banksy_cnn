@@ -17,13 +17,12 @@ def save_model_with_metadata(model,
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
-    if fold is not None:
-        # cross-validate models
-        filename = f'cnn_{hyperparams["tile_h"]}x{hyperparams["tile_w"]}_overlap{hyperparams["overlap"]:.1f}_entropy{hyperparams["entropy_threshold"]:.1f}_{hyperparams["architecture"]}_fold{fold}'
+    # for fully trained models
+    filename = f'cnn_{hyperparams["tile_h"]}x{hyperparams["tile_w"]}_overlap{hyperparams["overlap"]:.1f}_entropy{hyperparams["entropy_threshold"]:.1f}_{hyperparams["architecture"]}'
 
-    else:
-        # fully trained models
-        filename = f'cnn_{hyperparams["tile_h"]}x{hyperparams["tile_w"]}_overlap{hyperparams["overlap"]:.1f}_entropy{hyperparams["entropy_threshold"]:.1f}'
+    # for cv models
+    if fold is not None:
+        filename += '_fold{fold}'
 
     model_path = os.path.join(save_dir, f'{filename}.keras')
     model.save(model_path)

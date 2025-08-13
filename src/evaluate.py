@@ -1,5 +1,5 @@
 import numpy as np
-from src.model_loader import load_model
+from src.utils import load_model
 from src.get_image_tiles import make_img_tiles
 from src.get_entropy import get_img_entropy
 from src.prepare_tiles import prepare_tile_for_cnn
@@ -21,11 +21,10 @@ def evaluate_on_test_set(X_test,
     '''
     if model is None and model_path is not None:
         model = load_model(model_path)
+        hyperparams = get_hyperparams(model_path)
+
     elif model is None:
         raise ValueError('Either model or model_path must be provided')
-
-    if model_path:
-        hyperparams = get_hyperparams(model_path)
 
     print('\nEvaluating on test set...')
 
@@ -62,8 +61,16 @@ def evaluate_on_test_set(X_test,
         else:
             print(f'Warning: No valid tiles found for test image with label {true_label}')
 
+    # FOR EXPERIMENTATION:
+    print('Image Predictions:')
+    print(image_predictions)
+    print('True Labels:')
+    print(image_true_labels)
+    ##############################
+
     # calc image-level metrics
-    classification_threshold = hyperparams.get('classification_threshold', .5)
+    classification_threshold = .56  # experimenting, DELETE ME
+    # classification_threshold = hyperparams.get('classification_threshold', .5)
     image_pred_binary = (np.array(image_predictions) > classification_threshold).astype(int)
     test_metrics = get_metrics(
         image_true_labels, image_pred_binary, image_predictions, 'img', single_img=single_img)

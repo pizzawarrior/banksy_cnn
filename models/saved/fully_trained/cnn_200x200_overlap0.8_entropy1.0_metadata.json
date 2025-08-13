@@ -8,5 +8,12 @@
     "learning_rate": 0.001
   },
   "model_path": "models/saved/fully_trained/cnn_200x200_overlap0.8_entropy1.0.keras",
-  "history_path": "models/saved/fully_trained/cnn_200x200_overlap0.8_entropy1.0_history.json"
+  "history_path": "models/saved/fully_trained/cnn_200x200_overlap0.8_entropy1.0_history.json",
+  "test_metrics": {
+    "img_accuracy": 0.5,
+    "img_f1": 0.6666666666666666,
+    "img_precision": 0.5,
+    "img_recall": 1.0,
+    "img_auc": 0.8194444444444444
+  }
 }

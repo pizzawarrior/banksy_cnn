@@ -1,5 +1,6 @@
 # no jpg images
 *.jpg
+*.png
 *.keras
 *.h5
 
