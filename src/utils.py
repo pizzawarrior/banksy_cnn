@@ -47,48 +47,69 @@ def model_builders(hyperparams):
     return model, early_stopping, reduce_lr
 
 
-def get_metadata(file_path):
+def get_metadata(file_path, tested):
     '''
     take metadata file path and parse the json file.
     grab precision, f1, and accuracy from the 'metrics' key.
     return a dict of model performance metrics.
+    this is currently configured for grabbing the results ONLY from cv trained models, not
+    fully trained and tested ones.
     NOTE: early on there was an error in the way training and validation metrics
-        were recorded, and all the validation metrics were actually a copy of the training ones.
+        were calculated, and all the validation metrics were actually a copy of the training ones.
         This was later changed to tile_*metric* and img_*metric*. Because earlier models only
         recorded training metrics, we compare training metrics, not validation ones.
         This should be changed in the future as new models are added, and the older ones are removed.
     '''
-    assert isinstance(file_path, str), 'Metadata file path must be a string'
+    assert isinstance(file_path, str), 'Error: Metadata file path must be a string.'
 
     with open(file_path, 'r') as f:
         config = json.load(f)
 
-    metrics = config.get('metrics')
-    results = {}
+    # for cv_results
+    if tested is False:
+        metrics = config.get('metrics')
+        results = {}
 
-    if metrics:
-        output_metrics = ['precision', 'f1', 'accuracy']
-        for metric in output_metrics:
-            value = metrics.get(metric)
-            if value is None:
-                # see above for why we don't use img_*metric*
-                value = metrics.get(f'tile_{metric}')
-            results[metric] = round(value, 4)
+        if metrics:
+            output_metrics = ['precision', 'f1', 'accuracy']
+            for metric in output_metrics:
+                value = metrics.get(metric)
+                if value is None:
+                    # see above for why we don't use img_*metric*
+                    value = metrics.get(f'tile_{metric}')
+                results[metric] = round(value, 4)
+
+        else:
+            print(f'No metrics metadata found for file path: {file_path}')
 
     else:
-        print(f'No metadata found for file path: {file_path}')
+        metrics = config.get('test_metrics')
+        results = {}
+
+        if metrics:
+            output_metrics = ['img_precision', 'img_f1', 'img_accuracy']
+            for metric in output_metrics:
+                value = metrics.get(metric)
+                results[metric] = round(value, 4)
+
+        else:
+            print(f'No metrics metadata found for file path: {file_path}')
 
     return results
 
 
-def get_saved_metrics(dir_path='models/saved/cv_results'):
+def get_saved_metrics(dir_path, tested):
     '''
-    reads the metadata files from cv_results and parse the performance metrics of each cv model.
+    reads the metadata files from saved models and parses the performance metrics.
+    use with both cv and fully trained models.
     create a new dict with the path to the model as the key and {precision, f1, accuracy}
     as the value.
     returns the dict.
-    this is used to locate the best models from the cv_results. likely a single-use function.
+    this is used to locate the best models.
+    likely a single-use function.
     '''
+    assert isinstance(dir_path, str), 'Error: The argument for dir_path must be of type string.'
+
     metadata_dict = {}
 
     # find all metadata paths, parse the files, and add the metrics to a dict
@@ -96,29 +117,40 @@ def get_saved_metrics(dir_path='models/saved/cv_results'):
         for filename in filenames:
             if filename.endswith('metadata.json'):
                 file_path = os.path.join(dir_path, filename)
-                metadata_dict[file_path] = get_metadata(file_path)
+                metadata_dict[file_path] = get_metadata(file_path, tested)
     if not metadata_dict:
         return f'There are no metadata files in the current directory: {dir_path}'
     return metadata_dict
 
 
-def get_top_n_models(metadata_dict, n=5):
+def sort_models(metadata_dict, tested):
     '''
-    take a dictionary of metadata performance metrics and sort them in
-    descending order to isolate the top n models.
-    ensure that each n model is unique (recall that 4 models with the same config
-    are saved for every model), we only want to add one of those to the top n list.
-    this is used to locate the best models from the cv_results. likely a single-use function.
+    take a dictionary of model paths and their respective performance
+    metrics: (precision, f1, accuracy) and sort them in descending order.
+    returns a dictionary of models sorted by rank.
+    this is used for finding the best cv or fully trained models.
     '''
+    metrics = ['precision', 'f1', 'accuracy']
+
+    if tested is True:
+        metrics = ['img_' + item for item in metrics]
+
     ranked_models = dict(sorted(
         metadata_dict.items(),
-        key=lambda model: (
-            model[1]['precision'],
-            model[1]['f1'],
-            model[1]['accuracy']),
+        key=lambda model: [model[1][item] for item in metrics],
         reverse=True
     ))
+    return ranked_models
 
+
+def filter_top_cv_models(ranked_models, n):
+    '''
+    ensure that each n model is unique (recall that 4 models with the same config
+    are saved for every model)-- we only want to add one of those to the top n list.
+    accepts ranked models (dict) and n (the total number of desired models) as arguments.
+    this is used to locate the best models from the cv_results.
+    likely a single-use function.
+    '''
     unique_models = {}
     seen_configs = set()
     i = 0
@@ -154,12 +186,17 @@ def get_metadata_hyperparams(unique_models):
 def train_top_models():
     '''
     train the top n models, save the metrics.
+    this is used to filter the top n cv models and train them with the full dataset.
     this is basically a throwaway function.
     '''
+    tested = False
+    n = 5  # try using 5 models, this is a trivial number
+    dir_path = 'models/saved/cv_results'
     image_list, labels = get_images()
     X_train, _, y_train, _ = split_data_train_test(image_list, labels)
-    metadata_dict = get_saved_metrics()
-    top_n_models = get_top_n_models(metadata_dict)  # get top n models, currently 5
+    metadata_dict = get_saved_metrics(dir_path, tested)
+    ranked_models = sort_models(metadata_dict, tested)
+    top_n_models = filter_top_cv_models(ranked_models, n)  # get top n models, currently 5
     hyperparameters = get_metadata_hyperparams(top_n_models)
 
     from src.train_full import train_full  # avoid circular imports with train_full
@@ -173,6 +210,7 @@ def get_trained_model_paths(dir_path='models/saved/fully_trained'):
     get all the model paths from the default dir and add to a list.
     return list. we gather all of them so we can test them.
     this may be a one-time-use function.
+    use for testing all fully trained models.
     '''
     model_paths = []
 
