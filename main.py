@@ -89,29 +89,29 @@ def test_best_models():
 
 
 def main():
-    # Do not comment me out: this configues tf to access the local GPU
+    # Do not comment me out: this configures tf to access the local GPU
     configure_tf()
 
-##############
+    ##############
 
     # model fitting and experimentation:
-    # run_experiment()
+    run_experiment()
 
-##############
+    ##############
 
-    # single model testing; full test dataset:: THESE ARE CV MODELS:::::
-    # # model_path = models/saved/cv_results/cnn_200x200_overlap0.5_entropy2.0_3layer_fold4.keras - best model
+    # single model testing; full test dataset:
+    # model_path = models/saved/cv_results/cnn_200x200_overlap0.5_entropy2.0_3layer_fold4.keras - best model
     # _, image_pred_binary, image_true_labels = test_one_model(model_path, single_img=False)
 
-##############
+    ##############
 
     # testing all saved models on the full test set
     # test_best_models()
 
-##############
+    ##############
 
     # retrieve the best fully trained model
-    get_best_model()
+    # get_best_model(dir_path='models/saved/fully')
 
 
 if __name__ == "__main__":

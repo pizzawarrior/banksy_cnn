@@ -1,7 +1,7 @@
 import numpy as np
 from src.utils import load_model
 from src.get_image_tiles import make_img_tiles
-from src.get_entropy import get_img_entropy
+from src.get_entropy import get_entropy
 from src.prepare_tiles import prepare_tile_for_cnn
 from src.get_metrics import get_metrics
 from src.get_hyperparams import get_hyperparams
@@ -37,11 +37,11 @@ def evaluate_on_test_set(X_test,
 
     for img, true_label in zip(X_test, y_test):
         tiles = make_img_tiles(img, hyperparams['tile_h'], hyperparams['tile_w'], hyperparams['overlap'])
-        img_entropy = get_img_entropy(img)
+        img_entropy = get_entropy(img)
 
         tile_predictions = []
         for tile in tiles:
-            tile_entropy = get_img_entropy(tile)
+            tile_entropy = get_entropy(tile)
             tiles_attempted += 1
             if tile_entropy >= img_entropy - hyperparams['entropy_threshold']:
                 tile_cnn = prepare_tile_for_cnn(tile, augment=False)
@@ -69,8 +69,10 @@ def evaluate_on_test_set(X_test,
     ##############################
 
     # calc image-level metrics
-    classification_threshold = .56  # experimenting, DELETE ME
-    # classification_threshold = hyperparams.get('classification_threshold', .5)
+    # classification_threshold = .56  # experimenting, DELETE ME
+    #####################
+
+    classification_threshold = hyperparams.get('classification_threshold', .5)
     image_pred_binary = (np.array(image_predictions) > classification_threshold).astype(int)
     test_metrics = get_metrics(
         image_true_labels, image_pred_binary, image_predictions, 'img', single_img=single_img)

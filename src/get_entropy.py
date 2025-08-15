@@ -2,7 +2,7 @@ import numpy as np
 from scipy.stats import entropy
 
 
-def get_img_entropy(img):
+def get_entropy(img):
     '''
     flattens a grayscale image and tile then computes a histogram and probability dist of
     each pixel. then computes the total image entropy and returns it.

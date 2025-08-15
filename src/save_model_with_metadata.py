@@ -22,7 +22,7 @@ def save_model_with_metadata(model,
 
     # for cv models
     if fold is not None:
-        filename += '_fold{fold}'
+        filename += f'_fold{fold}'
 
     model_path = os.path.join(save_dir, f'{filename}.keras')
     model.save(model_path)
@@ -45,10 +45,13 @@ def save_model_with_metadata(model,
         metadata['metrics'] = metrics
         metadata['fold'] = fold
 
-        print(f'Tile validation accuracy: {metrics["tile_accuracy"]:.4f}')
-        print(f'Tile validation F1: {metrics["tile_f1"]:.4f}')
-        print(f'Image validation accuracy: {metrics["img_accuracy"]:.4f}')
-        print(f'Image validation F1: {metrics["img_f1"]:.4f}')
+        print(f'Tile precision: {metrics["tile_precision"]:.4f}')
+        print(f'Tile F1: {metrics["tile_f1"]:.4f}')
+        print(f'Tile accuracy: {metrics["tile_accuracy"]:.4f}')
+        print('***********')
+        print(f'Image precision: {metrics["img_precision"]:.4f}')
+        print(f'Image F1: {metrics["img_f1"]:.4f}')
+        print(f'Image accuracy: {metrics["img_accuracy"]:.4f}')
 
     metadata_path = os.path.join(save_dir, f'{filename}_metadata.json')
 

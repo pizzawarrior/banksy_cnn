@@ -30,7 +30,6 @@ def get_metrics(y_test, y_pred, y_pred_proba, data_object, single_img=False):
     }
 
     metrics = {
-        # use zero_division for when we experiment with different thresholds
         name: func(y_test, y_pred)
         for name, func in metric_funcs.items()
     }

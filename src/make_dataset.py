@@ -1,6 +1,6 @@
 import numpy as np
 from src.get_image_tiles import make_img_tiles
-from src.get_entropy import get_img_entropy
+from src.get_entropy import get_entropy
 from src.prepare_tiles import prepare_tile_for_cnn
 
 
@@ -19,14 +19,15 @@ def create_tiles_dataset(images, labels, tile_h, tile_w, overlap, entropy_thresh
 
     for img_idx, (img, label) in enumerate(zip(images, labels)):
         tiles = make_img_tiles(img, tile_h, tile_w, overlap)
-        img_entropy = get_img_entropy(img)
+        img_entropy = get_entropy(img)
 
         assert entropy_threshold < img_entropy, f'Please use an entropy threshold lower than {img_entropy}'
 
         valid_tiles = 0
         for tile in tiles:
-            tile_entropy = get_img_entropy(tile)
-            if tile_entropy >= img_entropy - entropy_threshold:
+            tile_entropy = get_entropy(tile)
+            if tile_entropy >= 0:  # delete me
+            # if tile_entropy >= img_entropy - entropy_threshold:
                 tile_cnn = prepare_tile_for_cnn(tile, augment=augment)
                 tile_data.append(tile_cnn)
                 tile_labels.append(label)

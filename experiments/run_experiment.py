@@ -21,9 +21,9 @@ def run_experiment():
         #     'classification_threshold': .4
         # },
         {
-            'tile_h': 150, 'tile_w': 150, 'overlap': 0.5, 'entropy_threshold': 1.5,
-            'architecture': '5layer', 'learning_rate': 0.001, 'batch_size': 64,
-            'classification_threshold': .4
+            'tile_h': 200, 'tile_w': 200, 'overlap': 0.5, 'entropy_threshold': 0.0,
+            'architecture': '3layer', 'learning_rate': 0.0001, 'batch_size': 16,
+            'classification_threshold': .5
         },
         # {
         #     'tile_h': 250, 'tile_w': 250, 'overlap': 0.8, 'entropy_threshold': 2.0,
@@ -62,6 +62,8 @@ def run_experiment():
         print(f'Overlap: {hyperparams["overlap"]}, Entropy: {hyperparams["entropy_threshold"]}')
         print(f'Classification threshold: {hyperparams["classification_threshold"]}')
         print(f'Architecture: {hyperparams["architecture"]}')
+        print(f'Tile CV Precision: {cv_summary["tile_precision_mean"]:.4f}')
+        print(f'Img CV Precision: {cv_summary["img_precision_mean"]:.4f}')
         print(f'Tile CV Accuracy: {cv_summary["tile_accuracy_mean"]:.4f}')
         print(f'Img CV Accuracy: {cv_summary["img_accuracy_mean"]:.4f}')
         print(f'Tile CV F1: {cv_summary["tile_f1_mean"]:.4f}')
