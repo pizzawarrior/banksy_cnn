@@ -200,17 +200,19 @@ def train_top_models():
     hyperparameters = get_metadata_hyperparams(top_n_models)
 
     from src.train_full import train_full  # avoid circular imports with train_full
+    models = []
     for hyperparams in hyperparameters:
-        train_full(X_train, y_train, hyperparams)
-    return
+        model, _, _ = train_full(X_train, y_train, hyperparams)
+        models.append(model)
+    return models
 
 
 def get_trained_model_paths(dir_path='models/saved/fully_trained'):
     '''
     get all the model paths from the default dir and add to a list.
     return list. we gather all of them so we can test them.
+    use for testing ALL fully trained models.
     this may be a one-time-use function.
-    use for testing all fully trained models.
     '''
     model_paths = []
 

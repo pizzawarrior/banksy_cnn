@@ -4,17 +4,15 @@ from experiments.run_experiment import run_experiment
 from src.tf_setup import configure_tf
 from src.split_data import split_data_train_test
 from src.evaluate import evaluate_on_test_set
-from src.utils import get_trained_model_paths, get_model_name, get_saved_metrics, save_metrics, sort_models
+from src.train_full import train_full
+from src.utils import get_model_name, get_saved_metrics, save_metrics, sort_models
 from src.get_metrics import show_conf_matrix
-
-
-# TODO: add other IDEAL STATE functions
 
 
 def get_best_model(dir_path='models/saved/fully_trained'):
     '''
-    comb thru the models/saved/fully_trained metadata files and sort the
-    metrics.
+    comb thru the models/saved/fully_trained metadata files and sort thru the
+    metrics to find the best model.
     default dir_path is set to fully trained models, but will also work
     for cv trained models too.
     return the path to the best model.
@@ -37,7 +35,19 @@ def get_best_model(dir_path='models/saved/fully_trained'):
     return model_path
 
 
-def test_one_model(model_path, single_img=False, cm_plot_save_path='plots/confusion_matrices'):
+def train_test_one_model(X_train, X_test, y_train, y_test):
+    hyperparams = {
+            'tile_h': 200, 'tile_w': 200, 'overlap': 0.5, 'entropy_threshold': 5,
+            'architecture': '3layer', 'learning_rate': 0.0001, 'batch_size': 16,
+            'classification_threshold': .4
+    }
+    _, history, result_paths = train_full(X_train, y_train, hyperparams)
+    model_path = result_paths[0]
+    # TODO: plot the loss and accuracy by accessing history
+    return test_one_model(X_test, y_test, model_path, single_img=False)
+
+
+def test_one_model(X_test, y_test, model_path, single_img=False):
     '''
     test one selected model against either the the full test dataset or a single image.
     we generate performance metrics and save them to the metadata file.
@@ -52,9 +62,6 @@ def test_one_model(model_path, single_img=False, cm_plot_save_path='plots/confus
     otherwise if testing on a full test set:
         - we generate and save a confusion matrix.
     '''
-    image_list, labels = get_images()
-    _, X_test, _, y_test = split_data_train_test(image_list, labels)
-
     if single_img is True:
         test_img = X_test[1]  # placeholder:: select your test image
         plt.imshow(test_img, cmap='gray')  # display image for reference
@@ -66,6 +73,7 @@ def test_one_model(model_path, single_img=False, cm_plot_save_path='plots/confus
         return test_metrics, image_pred_binary, image_true_labels, tile_predictions
 
     else:
+        cm_plot_save_path = 'plots/confusion_matrices'
         results = evaluate_on_test_set(X_test, y_test, model_path=model_path, single_img=False)
         test_metrics, image_pred_binary, image_true_labels = results
         file_path_model_name = (cm_plot_save_path, get_model_name(model_path))  # for saving cm plot
@@ -74,44 +82,32 @@ def test_one_model(model_path, single_img=False, cm_plot_save_path='plots/confus
         return test_metrics, image_pred_binary, image_true_labels
 
 
-# delete or move me
-# this lives here for the moment to avoid circular dependencies
-def test_best_models():
-    '''
-    get the paths for all fully traind models and test each one.
-    Store their metrics and return various results.
-    likely a one-time-use function.
-    '''
-    model_paths = get_trained_model_paths()
-    for model_path in model_paths:
-        test_one_model(model_path)
-    return
-
-
 def main():
     # Do not comment me out: this configures tf to access the local GPU
     configure_tf()
 
     ##############
+    # get dataset
+    image_list, labels = get_images()
+    X_train, X_test, y_train, y_test = split_data_train_test(image_list, labels)
 
     # model fitting and experimentation:
-    run_experiment()
+    # run_experiment()
 
     ##############
 
     # single model testing; full test dataset:
     # model_path = models/saved/cv_results/cnn_200x200_overlap0.5_entropy2.0_3layer_fold4.keras - best model
-    # _, image_pred_binary, image_true_labels = test_one_model(model_path, single_img=False)
-
-    ##############
-
-    # testing all saved models on the full test set
-    # test_best_models()
+    # _, image_pred_binary, image_true_labels = test_one_model(model_path, X_test, y_test)
 
     ##############
 
     # retrieve the best fully trained model
     # get_best_model(dir_path='models/saved/fully')
+
+    ##############
+    # train/ test one model
+    train_test_one_model(X_train, X_test, y_train, y_test)
 
 
 if __name__ == "__main__":

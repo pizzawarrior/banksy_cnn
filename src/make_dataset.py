@@ -26,8 +26,8 @@ def create_tiles_dataset(images, labels, tile_h, tile_w, overlap, entropy_thresh
         valid_tiles = 0
         for tile in tiles:
             tile_entropy = get_entropy(tile)
-            if tile_entropy >= 0:  # delete me
-            # if tile_entropy >= img_entropy - entropy_threshold:
+            # if tile_entropy >= 0:  # delete me
+            if tile_entropy >= img_entropy - entropy_threshold:
                 tile_cnn = prepare_tile_for_cnn(tile, augment=augment)
                 tile_data.append(tile_cnn)
                 tile_labels.append(label)
