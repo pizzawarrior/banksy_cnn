@@ -36,10 +36,17 @@ def get_best_model(dir_path='models/saved/fully_trained'):
 
 
 def train_test_one_model(X_train, X_test, y_train, y_test):
+    '''
+    this allows us to fully train and test one model.
+    it is intended to be used after experimentation has been done with
+    creating new cv models. hyperparams from the best fold can be pasted here
+    so that we can quickly compare how a fully trained model with the same hyperparams
+    performs on test data.
+    '''
     hyperparams = {
-            'tile_h': 200, 'tile_w': 200, 'overlap': 0.5, 'entropy_threshold': 5,
-            'architecture': '3layer', 'learning_rate': 0.0001, 'batch_size': 16,
-            'classification_threshold': .4
+        'tile_h': 200, 'tile_w': 200, 'overlap': 0.1, 'entropy_threshold': 1.5,
+        'architecture': '3layer', 'learning_rate': 0.0001, 'batch_size': 64,
+        'classification_threshold': .61
     }
     _, history, result_paths = train_full(X_train, y_train, hyperparams)
     model_path = result_paths[0]
@@ -108,6 +115,10 @@ def main():
     ##############
     # train/ test one model
     train_test_one_model(X_train, X_test, y_train, y_test)
+    # NOTE: for experimentation purposes we are currently weighting the 0 class
+    # in model.fit() as class_weight={0: 9.0} --> effectively giving non-Banksys
+    # 9x the weight of the positive class, as the models are mostly stuck in
+    # 'collapsed positive class' behavior.
 
 
 if __name__ == "__main__":

@@ -40,13 +40,14 @@ def train_full(X_train,
 
     model, early_stopping, reduce_lr = model_builders(hyperparams)
     epochs = 50
-    batch_size = hyperparams.get('batch_size', 16)
+    batch_size = hyperparams.get('batch_size', 32)
 
     history = model.fit(
         X_tiles, y_tiles,
         validation_split=0.1,  # holdout 10% for validation
         epochs=epochs,
         batch_size=batch_size,
+        class_weight={0: 9.0},  # experiment with weighting 0 class higher
         callbacks=[early_stopping, reduce_lr],
         verbose=1
     )

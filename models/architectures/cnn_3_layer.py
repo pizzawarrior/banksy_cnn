@@ -25,7 +25,7 @@ def cnn_3_layer(tile_h, tile_w, learning_rate=0.001):
 
     # classification
     model.add(layers.Dense(128, activation='relu'))
-    model.add(layers.Dropout(0.3))
+    model.add(layers.Dropout(0.5))  # binary classification: >0.5 = real, <0.5 = fake
     model.add(layers.Dense(1, activation='sigmoid'))
 
     # compile
