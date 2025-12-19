@@ -37,15 +37,13 @@ def get_best_model(dir_path='models/saved/fully_trained'):
 
 def train_test_one_model(X_train, X_test, y_train, y_test):
     '''
-    this allows us to train and test one model on the full dataset.
-    it is intended to be used after experimentation has been done with
-    creating new cv models. hyperparams from the best fold can be pasted here
-    so that we can quickly compare how a fully trained model with the same hyperparams
-    performs on test data.
+    this allows us to train one model on the full dataset, and test it.
+    it is intended to be used for experimentation using the cv-trained model hyperparams as a reference.
+    use this for fine tuning each of the params.
     '''
     hyperparams = {
-        'tile_h': 200, 'tile_w': 200, 'overlap': 0.5, 'entropy_threshold': 3.,
-        'architecture': '3layer', 'learning_rate': 0.000001, 'batch_size': 128,
+        'tile_h': 200, 'tile_w': 200, 'overlap': 0.8, 'entropy_threshold': .5,
+        'architecture': '5layer', 'learning_rate': 0.0001, 'batch_size': 32,
         'classification_threshold': .5
     }
     _, history, result_paths = train_full(X_train, y_train, hyperparams)
@@ -73,7 +71,6 @@ def test_one_model(X_test, y_test, model_path, single_img=False):
         test_img = X_test[1]  # placeholder: select your test image index
         plt.imshow(test_img, cmap='gray')  # display image for reference
         plt.show()
-        # test_metrics, image_pred_binary, image_true_labels, tile_predictions
         results = evaluate_on_test_set(X_test, y_test, model_path=model_path, single_img=True)
         test_metrics, image_pred_binary, image_true_labels, tile_predictions = results
         save_metrics(test_metrics, model_path)
@@ -98,28 +95,22 @@ def main():
     image_list, labels = get_images()
     X_train, X_test, y_train, y_test = split_data_train_test(image_list, labels)
 
+    ##############
     # model fitting and experimentation:
     # run_experiment()
 
     ##############
-
     # single model testing, full test dataset:
-    # model_path = models/saved/cv_results/cnn_200x200_overlap0.5_entropy2.0_3layer_fold4.keras - best model
-    # _, image_pred_binary, image_true_labels = test_one_model(model_path, X_test, y_test)
+    # model_path = 'models/saved/cv_results/cnn_200x200_overlap0.5_entropy2.0_3layer_fold4.keras'  # - best model
+    # _, image_pred_binary, image_true_labels = test_one_model(X_test, y_test, model_path)
 
     ##############
-
     # retrieve the best fully trained model
     # get_best_model(dir_path='models/saved/fully')
 
     ##############
-    # train/ test one model
+    # train/ test one model using hyperparams pasted into the fn below
     train_test_one_model(X_train, X_test, y_train, y_test)
-    # NOTE: for experimentation purposes we are currently weighting the 0 class (non-Banksy)
-    # in model.fit() as class_weight={0: 9.0} --> effectively giving non-Banksys
-    # 9x the weight of the positive class, as the models are mostly stuck in
-    # 'collapsed positive class' behavior due to class imbalance.
-
 
 if __name__ == "__main__":
     main()

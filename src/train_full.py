@@ -42,7 +42,7 @@ def train_full(X_train,
 
     model, early_stopping, reduce_lr = model_builders(hyperparams)
     epochs = 50
-    batch_size = hyperparams.get('batch_size', 32)
+    batch_size = hyperparams.get('batch_size', 32)  # set default to 32
 
     history = model.fit(
         X_tiles, y_tiles,

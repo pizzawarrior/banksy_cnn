@@ -37,22 +37,24 @@ def create_tiles_dataset(images, labels, tile_h: int, tile_w: int, overlap: floa
                 tile_to_image_map.append(img_idx)
                 valid_tiles += 1
 
-        print(f'Image with label {label}: {valid_tiles}/{len(tiles)} tiles passed entropy threshold: {img_entropy}.')
+        # print(f'Image with label {label}: {valid_tiles}/{len(tiles)} tiles passed entropy threshold: {img_entropy}.')
 
     tile_data = np.array(tile_data)
     tile_labels = np.array(tile_labels)
     tile_to_image_map = np.array(tile_to_image_map)
 
-    # verify class balance across tiles: SHOULD THIS BE A HELPER FN??
+    # verify class balance across tiles
+    # TODO: consider flipping or rotating the dupe tiles
     positive_count = np.sum(tile_labels)  # grab 1's
     negative_count = len(tile_labels) - positive_count  # grab 0's
+    print(f'Before balancing classes, class 1 = {positive_count}/{len(tile_labels)}')
 
     if positive_count != negative_count:
         rng = make_random_generator()
         minority_label = 1 if positive_count < negative_count else 0
         minority_idxs = np.where(tile_labels == minority_label)[0]
         n_samples = abs(positive_count - negative_count)
-        rand_idxs = rng.choice(minority_idxs, size=n_samples, replace=False)
+        rand_idxs = rng.choice(minority_idxs, size=n_samples, replace=True)
 
         tile_data = np.concat((tile_data, tile_data[rand_idxs]))
         tile_labels = np.concat((tile_labels, tile_labels[rand_idxs]))
