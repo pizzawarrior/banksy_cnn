@@ -9,6 +9,8 @@ from sklearn.metrics import (accuracy_score,
                              )
 
 
+# TODO: should these fn's be moved to utils.py????
+
 def get_metrics(y_test, y_pred, y_pred_proba, data_object, single_img=False):
     '''
     calculate comprehensive classification metrics

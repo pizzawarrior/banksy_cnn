@@ -14,17 +14,15 @@ def evaluate_on_test_set(X_test,
                          model=None,
                          single_img=False):
     '''
-    Evaluate a trained model on the test set using tile-level predictions
+    Evaluate a trained model on the test set (or single image) using tile-level predictions
     averaged to image-level predictions.
-    TODO: is there any reason why we should be testing cv fold models?
-    why not train the full model then test it?...
     '''
     if model is None and model_path is not None:
         model = load_model(model_path)
         hyperparams = get_hyperparams(model_path)
 
     elif model is None:
-        raise ValueError('Either model or model_path must be provided')
+        raise ValueError('A model or model_path must be provided')
 
     print('\nEvaluating on test set...')
 

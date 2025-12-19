@@ -1,12 +1,17 @@
 import json
 import os
 import re
+import numpy as np
 from tensorflow import keras
 from models.architectures.cnn_3_layer import cnn_3_layer
 from models.architectures.cnn_5_layer import cnn_5_layer
 from src.data_loader import get_images
 from src.split_data import split_data_train_test
 
+def make_random_generator():
+    seed = 420
+    rng = np.random.default_rng(seed)
+    return rng
 
 def load_model(model_path):
     '''

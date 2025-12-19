@@ -37,16 +37,16 @@ def get_best_model(dir_path='models/saved/fully_trained'):
 
 def train_test_one_model(X_train, X_test, y_train, y_test):
     '''
-    this allows us to fully train and test one model.
+    this allows us to train and test one model on the full dataset.
     it is intended to be used after experimentation has been done with
     creating new cv models. hyperparams from the best fold can be pasted here
     so that we can quickly compare how a fully trained model with the same hyperparams
     performs on test data.
     '''
     hyperparams = {
-        'tile_h': 200, 'tile_w': 200, 'overlap': 0.1, 'entropy_threshold': 1.5,
-        'architecture': '3layer', 'learning_rate': 0.0001, 'batch_size': 64,
-        'classification_threshold': .61
+        'tile_h': 200, 'tile_w': 200, 'overlap': 0.5, 'entropy_threshold': 3.,
+        'architecture': '3layer', 'learning_rate': 0.000001, 'batch_size': 128,
+        'classification_threshold': .5
     }
     _, history, result_paths = train_full(X_train, y_train, hyperparams)
     model_path = result_paths[0]
@@ -61,16 +61,16 @@ def test_one_model(X_test, y_test, model_path, single_img=False):
     NOTE: this works for either cv trained models or fully trained ones.
     returns:
         - test_metrics: a dict of accuracy, f1, precision, recall scores
-        - converted image-level binary prediction(s), np.array
-        - true labels for image(s), np.array
+        - converted image-level binary prediction(s): np.array
+        - true labels for image(s): np.array
     if single image is True:
         - assumes image is already part of the `images` dataset.
-        - also returns all tile-level predictions, np.array
+        - also returns all tile-level predictions: np.array
     otherwise if testing on a full test set:
         - we generate and save a confusion matrix.
     '''
     if single_img is True:
-        test_img = X_test[1]  # placeholder:: select your test image
+        test_img = X_test[1]  # placeholder: select your test image index
         plt.imshow(test_img, cmap='gray')  # display image for reference
         plt.show()
         # test_metrics, image_pred_binary, image_true_labels, tile_predictions
@@ -80,9 +80,9 @@ def test_one_model(X_test, y_test, model_path, single_img=False):
         return test_metrics, image_pred_binary, image_true_labels, tile_predictions
 
     else:
-        cm_plot_save_path = 'plots/confusion_matrices'
         results = evaluate_on_test_set(X_test, y_test, model_path=model_path, single_img=False)
         test_metrics, image_pred_binary, image_true_labels = results
+        cm_plot_save_path = 'plots/confusion_matrices'
         file_path_model_name = (cm_plot_save_path, get_model_name(model_path))  # for saving cm plot
         show_conf_matrix(image_true_labels, image_pred_binary, file_path_model_name, save=True)
         save_metrics(test_metrics, model_path)
@@ -103,7 +103,7 @@ def main():
 
     ##############
 
-    # single model testing; full test dataset:
+    # single model testing, full test dataset:
     # model_path = models/saved/cv_results/cnn_200x200_overlap0.5_entropy2.0_3layer_fold4.keras - best model
     # _, image_pred_binary, image_true_labels = test_one_model(model_path, X_test, y_test)
 
@@ -115,10 +115,10 @@ def main():
     ##############
     # train/ test one model
     train_test_one_model(X_train, X_test, y_train, y_test)
-    # NOTE: for experimentation purposes we are currently weighting the 0 class
+    # NOTE: for experimentation purposes we are currently weighting the 0 class (non-Banksy)
     # in model.fit() as class_weight={0: 9.0} --> effectively giving non-Banksys
     # 9x the weight of the positive class, as the models are mostly stuck in
-    # 'collapsed positive class' behavior.
+    # 'collapsed positive class' behavior due to class imbalance.
 
 
 if __name__ == "__main__":

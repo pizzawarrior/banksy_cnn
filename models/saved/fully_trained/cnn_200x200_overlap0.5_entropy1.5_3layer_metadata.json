@@ -2,20 +2,20 @@
   "hyperparameters": {
     "tile_h": 200,
     "tile_w": 200,
-    "overlap": 0.1,
+    "overlap": 0.5,
     "entropy_threshold": 1.5,
     "architecture": "3layer",
     "learning_rate": 1e-06,
-    "batch_size": 128,
+    "batch_size": 256,
     "classification_threshold": 0.5
   },
-  "model_path": "models/saved/fully_trained/cnn_200x200_overlap0.1_entropy1.5_3layer.keras",
-  "history_path": "models/saved/fully_trained/cnn_200x200_overlap0.1_entropy1.5_3layer_history.json",
+  "model_path": "models/saved/fully_trained/cnn_200x200_overlap0.5_entropy1.5_3layer.keras",
+  "history_path": "models/saved/fully_trained/cnn_200x200_overlap0.5_entropy1.5_3layer_history.json",
   "test_metrics": {
     "img_accuracy": 0.5,
     "img_f1": 0.6666666666666666,
     "img_precision": 0.5,
     "img_recall": 1.0,
-    "img_auc": 0.13888888888888887
+    "img_auc": 0.23611111111111113
   }
 }

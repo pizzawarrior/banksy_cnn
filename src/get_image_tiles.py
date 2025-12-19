@@ -1,8 +1,7 @@
 
-def make_img_tiles(img, h, w, overlap):
+def make_img_tiles(img, h: int, w: int, overlap: float):
     '''
-    take an image, and break it into as many tiles as possible
-    using the provided params.
+    take a single image, and break it into tiles using the provided params.
     overlap must be a percent of type float.
     NOTE: ALL TILES MUST BE THE SAME EXACT SIZE, NO EXCEPTIONS.
     '''
@@ -28,7 +27,7 @@ def make_img_tiles(img, h, w, overlap):
             of {img.shape}, please update the requested tile dims.\n{"*"*50}')
         return
 
-    assert isinstance(overlap, float), 'Error: Overlap value must be float from 0-1.'
+    assert isinstance(overlap, float), 'Error: Overlap value must be float between 0-1.'
     offset = 1 - overlap
     overlap_h, overlap_w = int(offset * h), int(offset * w)
 

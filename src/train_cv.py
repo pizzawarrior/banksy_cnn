@@ -3,7 +3,7 @@ from sklearn.model_selection import StratifiedKFold
 from src.make_dataset import create_tiles_dataset
 from src.utils import model_builders
 from src.save_model_with_metadata import save_model_with_metadata
-from src.evaluate import get_metrics
+from src.get_metrics import get_metrics
 
 
 def train_model_with_cv(X_train,
@@ -22,8 +22,8 @@ def train_model_with_cv(X_train,
     '''
     print(f'\n{"="*50}')
     print('Training with hyperparameters:')
-    for key, value in hyperparams.items():
-        print(f'{key}: {value}')
+    for k, v in hyperparams.items():
+        print(f'{k}: {v}')
     print(f'{"="*50}')
 
     n_folds = 4

@@ -9,16 +9,18 @@ def train_full(X_train,
                hyperparams,
                save_dir='models/saved/fully_trained'):
     '''
-    search thru all metadata files and find the best performing models.
-    load the hyperparams of the top 5 UNIQUE model configurations.
-    (prevent multiple folds from the same model config from counting as different models).
-    train those 5 models and save their metrics.
+    - train a model on the full dataset using the hyperparams of a saved cv-model
+    accepts:
+        - training image set: np.array, X_train,
+        - corresponding training lables: np.array, y_train
+        - hyperparams: dict, contains saved model params
+    - save the model and performance metrics
     TODO: double check the training/ validation metrics that we have access to and can save.
     '''
     print(f'\n{"="*50}')
     print('Training with hyperparameters:')
-    for key, value in hyperparams.items():
-        print(f'{key}: {value}')
+    for k, v in hyperparams.items():
+        print(f'{k}: {v}')
     print(f'{"="*50}')
 
     X_tiles, y_tiles, _ = create_tiles_dataset(
@@ -47,7 +49,7 @@ def train_full(X_train,
         validation_split=0.1,  # holdout 10% for validation
         epochs=epochs,
         batch_size=batch_size,
-        class_weight={0: 9.0},  # experiment with weighting 0 class higher
+        # class_weight={0: 9.0},  # experiment with weighting 0 class higher
         callbacks=[early_stopping, reduce_lr],
         verbose=1
     )
