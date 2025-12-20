@@ -111,7 +111,6 @@ def get_saved_metrics(dir_path, tested):
     as the value.
     returns the dict.
     this is used to locate the best models.
-    likely a single-use function.
     '''
     assert isinstance(dir_path, str), 'Error: The argument for dir_path must be of type string.'
 

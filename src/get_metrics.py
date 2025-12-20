@@ -59,3 +59,12 @@ def show_conf_matrix(y_test, y_pred, path_file_model_name, save=False):
 
     plt.show()
     plt.close(fig)  # prevent ghost plots
+
+
+def show_training_accuracy_plots(history):
+    plt.plot(history.history['accuracy'], label='accuracy')
+    plt.plot(history.history['val_accuracy'], label='val_accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.ylim([0.5, 1])
+    plt.legend(loc='lower right')

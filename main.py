@@ -6,7 +6,7 @@ from src.split_data import split_data_train_test
 from src.evaluate import evaluate_on_test_set
 from src.train_full import train_full
 from src.utils import get_model_name, get_saved_metrics, save_metrics, sort_models
-from src.get_metrics import show_conf_matrix
+from src.get_metrics import show_conf_matrix, show_training_accuracy_plots
 
 
 def get_best_model(dir_path='models/saved/fully_trained'):
@@ -42,13 +42,13 @@ def train_test_one_model(X_train, X_test, y_train, y_test):
     use this for fine tuning each of the params.
     '''
     hyperparams = {
-        'tile_h': 200, 'tile_w': 200, 'overlap': 0.8, 'entropy_threshold': .5,
-        'architecture': '5layer', 'learning_rate': 0.0001, 'batch_size': 32,
+        'tile_h': 200, 'tile_w': 200, 'overlap': 0.1, 'entropy_threshold': 1,
+        'architecture': '3layer', 'learning_rate': 0.001, 'batch_size': 16,
         'classification_threshold': .5
     }
     _, history, result_paths = train_full(X_train, y_train, hyperparams)
+    show_training_accuracy_plots(history)
     model_path = result_paths[0]
-    # TODO: plot the loss and accuracy by accessing history
     return test_one_model(X_test, y_test, model_path, single_img=False)
 
 
@@ -88,12 +88,12 @@ def test_one_model(X_test, y_test, model_path, single_img=False):
 
 def main():
     # Do not comment me out: this configures tf to access the local GPU
-    configure_tf()
+    # configure_tf()
 
     ##############
     # get dataset
-    image_list, labels = get_images()
-    X_train, X_test, y_train, y_test = split_data_train_test(image_list, labels)
+    # image_list, labels = get_images()
+    # X_train, X_test, y_train, y_test = split_data_train_test(image_list, labels)
 
     ##############
     # model fitting and experimentation:
@@ -106,11 +106,11 @@ def main():
 
     ##############
     # retrieve the best fully trained model
-    # get_best_model(dir_path='models/saved/fully')
+    get_best_model()  # default is: dir_path='models/saved/fully_trained'
 
     ##############
     # train/ test one model using hyperparams pasted into the fn below
-    train_test_one_model(X_train, X_test, y_train, y_test)
+    # train_test_one_model(X_train, X_test, y_train, y_test)
 
 if __name__ == "__main__":
     main()
