@@ -11,7 +11,7 @@ from src.get_metrics import show_conf_matrix, show_training_accuracy_plots
 
 def get_best_model(dir_path='models/saved/fully_trained'):
     '''
-    comb thru the models/saved/fully_trained metadata files and sort thru the
+    comb thru the metadata files (from both cv_results and fully_trained) and sort thru the
     metrics to find the best model.
     default dir_path is set to fully trained models, but will also work
     for cv trained models too.
@@ -42,17 +42,16 @@ def train_test_one_model(X_train, X_test, y_train, y_test):
     use this for fine tuning each of the params.
     '''
     hyperparams = {
-        'tile_h': 200, 'tile_w': 200, 'overlap': 0.1, 'entropy_threshold': 1,
-        'architecture': '3layer', 'learning_rate': 0.001, 'batch_size': 16,
-        'classification_threshold': .5
+        'tile_h': 200, 'tile_w': 200, 'overlap': 0.8, 'entropy_threshold': 1,
+        'architecture': '5layer', 'learning_rate': 0.001, 'batch_size': 32,
+        'classification_threshold': .4
     }
     _, history, result_paths = train_full(X_train, y_train, hyperparams)
-    show_training_accuracy_plots(history)
     model_path = result_paths[0]
-    return test_one_model(X_test, y_test, model_path, single_img=False)
+    return test_one_model(X_test, y_test, model_path, single_img=False, history=history)
 
 
-def test_one_model(X_test, y_test, model_path, single_img=False):
+def test_one_model(X_test, y_test, model_path, single_img=False, history=None):
     '''
     test one selected model against either the the full test dataset or a single image.
     we generate performance metrics and save them to the metadata file.
@@ -79,24 +78,26 @@ def test_one_model(X_test, y_test, model_path, single_img=False):
     else:
         results = evaluate_on_test_set(X_test, y_test, model_path=model_path, single_img=False)
         test_metrics, image_pred_binary, image_true_labels = results
-        cm_plot_save_path = 'plots/confusion_matrices'
-        file_path_model_name = (cm_plot_save_path, get_model_name(model_path))  # for saving cm plot
-        show_conf_matrix(image_true_labels, image_pred_binary, file_path_model_name, save=True)
+        model_name = get_model_name(model_path)
+        cm_path_model_name = ('plots/confusion_matrices', model_name)  # for saving cm plot
+        acc_path_model_name = ('plots/accuracy_graphs', model_name)  # for saving cm plot
+        show_training_accuracy_plots(history, acc_path_model_name)
+        show_conf_matrix(image_true_labels, image_pred_binary, cm_path_model_name, save=True)
         save_metrics(test_metrics, model_path)
         return test_metrics, image_pred_binary, image_true_labels
 
 
 def main():
     # Do not comment me out: this configures tf to access the local GPU
-    # configure_tf()
+    configure_tf()
 
     ##############
     # get dataset
-    # image_list, labels = get_images()
-    # X_train, X_test, y_train, y_test = split_data_train_test(image_list, labels)
+    image_list, labels = get_images()
+    X_train, X_test, y_train, y_test = split_data_train_test(image_list, labels)
 
     ##############
-    # model fitting and experimentation:
+    # building cv trained models from scratch:
     # run_experiment()
 
     ##############
@@ -106,11 +107,11 @@ def main():
 
     ##############
     # retrieve the best fully trained model
-    get_best_model()  # default is: dir_path='models/saved/fully_trained'
+    # get_best_model()  # default is: dir_path='models/saved/fully_trained'
 
     ##############
     # train/ test one model using hyperparams pasted into the fn below
-    # train_test_one_model(X_train, X_test, y_train, y_test)
+    train_test_one_model(X_train, X_test, y_train, y_test)
 
 if __name__ == "__main__":
     main()

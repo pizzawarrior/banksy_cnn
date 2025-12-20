@@ -8,6 +8,7 @@ from sklearn.metrics import (accuracy_score,
                              ConfusionMatrixDisplay
                              )
 
+from src.utils import save_plot
 
 # TODO: should these fn's be moved to utils.py????
 
@@ -42,7 +43,7 @@ def get_metrics(y_test, y_pred, y_pred_proba, data_object, single_img=False):
     return {data_object + '_' + k: v for k, v in metrics.items()}
 
 
-def show_conf_matrix(y_test, y_pred, path_file_model_name, save=False):
+def show_conf_matrix(y_test, y_pred, cm_path_model_name, save=False):
     '''
     create and display conf matrix for testing
     '''
@@ -50,21 +51,21 @@ def show_conf_matrix(y_test, y_pred, path_file_model_name, save=False):
     cm = confusion_matrix(y_test, y_pred)
     disp = ConfusionMatrixDisplay(cm)
     disp.plot(ax=ax)
-    ax.set_title(path_file_model_name[1])
+    ax.set_title(cm_path_model_name[1])
 
     if save is True:
-        plot_path = '/'.join(path_file_model_name)
-        plt.savefig(plot_path.replace('.keras', '.png'))
-        print(f'Confusion Matrix saved to {path_file_model_name[0]}')
+        save_plot('confusion matrix', cm_path_model_name)
 
     plt.show()
     plt.close(fig)  # prevent ghost plots
 
 
-def show_training_accuracy_plots(history):
+def show_training_accuracy_plots(history, acc_path_model_name):
     plt.plot(history.history['accuracy'], label='accuracy')
     plt.plot(history.history['val_accuracy'], label='val_accuracy')
     plt.xlabel('Epoch')
     plt.ylabel('Accuracy')
+    plt.title(acc_path_model_name[1])
     plt.ylim([0.5, 1])
     plt.legend(loc='lower right')
+    save_plot('accuracy plot', acc_path_model_name)

@@ -2,6 +2,7 @@ import json
 import os
 import re
 import numpy as np
+import matplotlib.pyplot as plt
 from tensorflow import keras
 from models.architectures.cnn_3_layer import cnn_3_layer
 from models.architectures.cnn_5_layer import cnn_5_layer
@@ -255,12 +256,12 @@ def save_metrics(test_metrics, model_path):
     print('Model metadata file updated successfully with test-metrics.')
 
 
-def get_model_name(model_path):
+def get_model_name(model_path: str):
     '''
     take a relative model path, strip the path, and keep only the model name.
     returns a string for the full model name.
-    this is used to create a title for the confusion matrix when a model is
-    tested.
+    this is used to create a title for the confusion matrix or accuracy plot
+    when a model is tested.
     '''
     pattern = r'.*\/(.*)'
     match = re.match(pattern, model_path)
@@ -270,8 +271,15 @@ def get_model_name(model_path):
     return model_name
 
 
-def make_training_plots():
+def save_plot(plot_type: str, path_model_name: tuple):
     '''
-    make and save loss and accuracy plots for the saved fully trained models
+    save either a confusion matrix or accuracy plot from testing a model.
+        plot_type: string - description of the plot type.
+        path_model_name: tuple- the path for saving the plot, and the model name
     '''
-    pass
+    save_path = path_model_name[0]
+    if not os.path.isdir(save_path):
+        os.makedirs(save_path)
+    plot_path = '/'.join(path_model_name)
+    plt.savefig(plot_path.replace('.keras', '.png'))
+    print(f'{plot_type.title()} saved to {save_path}')
