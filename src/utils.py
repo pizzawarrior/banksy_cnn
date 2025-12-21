@@ -9,12 +9,14 @@ from models.architectures.cnn_5_layer import cnn_5_layer
 from src.data_loader import get_images
 from src.split_data import split_data_train_test
 
+
 def make_random_generator():
     seed = 420
     rng = np.random.default_rng(seed)
     return rng
 
-def load_model(model_path):
+
+def load_model(model_path: str):
     '''
     load a saved model using the provided model path.
     this is used for evaluating a model on test data.
@@ -28,7 +30,7 @@ def load_model(model_path):
         return
 
 
-def model_builders(hyperparams):
+def model_builders(hyperparams: dict):
     model_options = {
         '3layer': cnn_3_layer,
         '5layer': cnn_5_layer,
@@ -53,7 +55,7 @@ def model_builders(hyperparams):
     return model, early_stopping, reduce_lr
 
 
-def get_metadata(file_path, tested):
+def get_metadata(file_path: str, tested: bool):
     '''
     take metadata file path and parse the json file.
     grab precision, f1, and accuracy from the 'metrics' key.
@@ -104,7 +106,7 @@ def get_metadata(file_path, tested):
     return results
 
 
-def get_saved_metrics(dir_path, tested):
+def get_saved_metrics(dir_path: str, tested: bool):
     '''
     reads the metadata files from saved models and parses the performance metrics.
     use with both cv and fully trained models.
@@ -128,7 +130,7 @@ def get_saved_metrics(dir_path, tested):
     return metadata_dict
 
 
-def sort_models(metadata_dict, tested):
+def sort_models(metadata_dict: dict, tested: bool):
     '''
     take a dictionary of model paths and their respective performance
     metrics: (precision, f1, accuracy) and sort them in descending order.
@@ -235,7 +237,7 @@ def get_trained_model_paths(dir_path='models/saved/fully_trained'):
     return model_paths
 
 
-def save_metrics(test_metrics, model_path):
+def save_metrics(test_metrics, model_path: str):
     '''
     parse the provided model_path and format it so we can update the metadata file
     for the given model and add test metrics. all existing data is retained and untouched.
