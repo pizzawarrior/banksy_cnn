@@ -70,6 +70,7 @@ def evaluate_on_test_set(X_test,
     # classification_threshold = .56  # experimenting, DELETE ME
     #####################
 
+    # classification_threshold = .6  # because all predictions are for class=1, raise the threshold
     classification_threshold = hyperparams.get('classification_threshold', .5)
     image_pred_binary = (np.array(image_predictions) > classification_threshold).astype(int)
     test_metrics = get_metrics(

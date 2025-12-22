@@ -1,0 +1,21 @@
+{
+  "hyperparameters": {
+    "tile_h": 200,
+    "tile_w": 200,
+    "overlap": 0.8,
+    "entropy_threshold": 3,
+    "architecture": "3layer",
+    "learning_rate": 0.0001,
+    "batch_size": 16,
+    "classification_threshold": 0.4
+  },
+  "model_path": "models/saved/fully_trained/cnn_200x200_overlap0.8_entropy3.0_3layer.keras",
+  "history_path": "models/saved/fully_trained/cnn_200x200_overlap0.8_entropy3.0_3layer_history.json",
+  "test_metrics": {
+    "img_accuracy": 0.5,
+    "img_f1": 0.6666666666666666,
+    "img_precision": 0.5,
+    "img_recall": 1.0,
+    "img_auc": 0.8055555555555556
+  }
+}

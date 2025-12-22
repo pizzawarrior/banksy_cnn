@@ -11,6 +11,9 @@ def create_tiles_dataset(images, labels, tile_h: int, tile_w: int, overlap: floa
     accepts:
         - image array: X_train for training, or X_val_tiles for validation in cv training
         - labels array: y_train for training, or y_val_tiles for validation in cv training
+        - entropy_threshold: float. NOTE: this is setup to only include tiles with entropy
+        GREATER than parent-image-entropy MINUS entropy_threshold. The smaller the entropy_threshold
+        the MORE tiles will be REJECTED.
     returns:
         - tile_data: np.array of tiles in CNN format (batch, height, width, channels).
         - tile_labels: np.array of corresponding tile labels

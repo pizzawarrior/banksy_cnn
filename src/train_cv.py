@@ -29,7 +29,7 @@ def train_model_with_cv(X_train,
     n_folds = 4
     epochs = 50
 
-    skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=420)
+    skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=13)  # 420
 
     fold_results = []
     saved_results = []

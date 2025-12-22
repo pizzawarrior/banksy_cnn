@@ -10,7 +10,6 @@ from sklearn.metrics import (accuracy_score,
 
 from src.utils import save_plot
 
-# TODO: should these fn's be moved to utils.py????
 
 def get_metrics(y_test, y_pred, y_pred_proba, data_object, single_img=False):
     '''
@@ -28,7 +27,6 @@ def get_metrics(y_test, y_pred, y_pred_proba, data_object, single_img=False):
     metric_funcs = {
         'accuracy': accuracy_score,
         'f1': f1_score,
-        'precision': precision_score,
         'recall': recall_score,
     }
 
@@ -36,6 +34,8 @@ def get_metrics(y_test, y_pred, y_pred_proba, data_object, single_img=False):
         name: func(y_test, y_pred)
         for name, func in metric_funcs.items()
     }
+
+    metrics.update({'precision': precision_score(y_test, y_pred, zero_division=0)})
 
     if single_img is False:
         metrics.update({'auc': roc_auc_score(y_test, y_pred_proba)})
