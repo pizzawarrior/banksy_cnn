@@ -1,13 +1,13 @@
 from sklearn.model_selection import train_test_split
 
 
-def split_data_train_test(image_list, labels):
+def split_data(image_list, labels):
     '''
     takes the length of the full dataset and return random
     indices for training and testing sets.
     ~80% train, 20% test = 44 train, 12 test
     '''
-    random_state = 420  # formerly 420
+    random_state = 13  # formerly 420
     X_train, X_test, y_train, y_test = train_test_split(image_list, labels, test_size=0.2, stratify=labels, random_state=random_state)
     print(f'X_train has length: {len(X_train)}')
     print(f'y_train has length: {len(y_train)}')

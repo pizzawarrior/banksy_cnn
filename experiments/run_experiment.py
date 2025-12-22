@@ -1,6 +1,6 @@
 from src.data_loader import get_images
 from src.train_cv import train_model_with_cv
-from src.split_data import split_data_train_test
+from src.split_data import split_data
 
 
 def run_experiment():
@@ -11,7 +11,7 @@ def run_experiment():
     returns a list of dictionaries of model metadata and training/ validation metrics.
     '''
     image_list, labels = get_images('images')
-    X_train, _, y_train, _ = split_data_train_test(image_list, labels)
+    X_train, _, y_train, _ = split_data(image_list, labels)
 
     # define hyperparameter sets to test
     hyperparameter_sets = [
@@ -21,8 +21,8 @@ def run_experiment():
         #     'classification_threshold': .4
         # },
         {
-            'tile_h': 200, 'tile_w': 200, 'overlap': 0.5, 'entropy_threshold': 0.0,
-            'architecture': '3layer', 'learning_rate': 0.0001, 'batch_size': 16,
+            'tile_h': 200, 'tile_w': 200, 'overlap': 0.8, 'entropy_threshold': 1.2,
+            'architecture': '3layer', 'learning_rate': 0.001, 'batch_size': 32,
             'classification_threshold': .5
         },
         # {

@@ -2,10 +2,10 @@ import matplotlib.pyplot as plt
 from src.data_loader import get_images
 from experiments.run_experiment import run_experiment
 from src.tf_setup import configure_tf
-from src.split_data import split_data_train_test
+from src.split_data import split_data
 from src.evaluate import evaluate_on_test_set
 from src.train_full import train_full
-from src.utils import get_model_name, get_saved_metrics, save_metrics, sort_models
+from src.utils import get_model_name, get_saved_metrics, save_metrics, sort_models, filter_top_cv_models
 from src.get_metrics import show_conf_matrix, show_training_accuracy_plots
 
 
@@ -42,9 +42,9 @@ def train_test_one_model(X_train, X_test, y_train, y_test):
     use this for fine tuning each of the params.
     '''
     hyperparams = {
-        'tile_h': 200, 'tile_w': 200, 'overlap': 0.8, 'entropy_threshold': 1,
-        'architecture': '5layer', 'learning_rate': 0.001, 'batch_size': 32,
-        'classification_threshold': .4
+        'tile_h': 200, 'tile_w': 200, 'overlap': 0.8, 'entropy_threshold': 4,
+        'architecture': '3layer', 'learning_rate': 0.0001, 'batch_size': 16,
+        'classification_threshold': .6
     }
     _, history, result_paths = train_full(X_train, y_train, hyperparams)
     model_path = result_paths[0]
@@ -93,12 +93,12 @@ def main():
 
     ##############
     # get dataset
-    image_list, labels = get_images()
-    X_train, X_test, y_train, y_test = split_data_train_test(image_list, labels)
+    # image_list, labels = get_images()
+    # X_train, X_test, y_train, y_test = split_data(image_list, labels)
 
     ##############
     # building cv trained models from scratch:
-    # run_experiment()
+    run_experiment()
 
     ##############
     # single model testing, full test dataset:
@@ -110,8 +110,16 @@ def main():
     # get_best_model()  # default is: dir_path='models/saved/fully_trained'
 
     ##############
+    # Get current top n models from either fully_trained or cv_results
+    # If cv_results then tested=False
+    # metadata = get_saved_metrics('models/saved/fully_trained', tested=True)
+    # ranked_models = sort_models(metadata, tested=True)
+    # filter_top_cv_models(ranked_models, n=5)
+
+    ##############
     # train/ test one model using hyperparams pasted into the fn below
-    train_test_one_model(X_train, X_test, y_train, y_test)
+    # train_test_one_model(X_train, X_test, y_train, y_test)
+
 
 if __name__ == "__main__":
     main()

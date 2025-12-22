@@ -7,7 +7,7 @@ from tensorflow import keras
 from models.architectures.cnn_3_layer import cnn_3_layer
 from models.architectures.cnn_5_layer import cnn_5_layer
 from src.data_loader import get_images
-from src.split_data import split_data_train_test
+from src.split_data import split_data
 
 
 def make_random_generator():
@@ -150,7 +150,7 @@ def sort_models(metadata_dict: dict, tested: bool):
     return ranked_models
 
 
-def filter_top_cv_models(ranked_models, n):
+def filter_top_cv_models(ranked_models: dict, n: int):
     '''
     ensure that each n model is unique (recall that 4 models with the same config
     are saved for every model)-- we only want to add one of those to the top n list.
@@ -200,7 +200,7 @@ def train_top_models():
     n = 5  # try using 5 models, this is a trivial number
     dir_path = 'models/saved/cv_results'
     image_list, labels = get_images()
-    X_train, _, y_train, _ = split_data_train_test(image_list, labels)
+    X_train, _, y_train, _ = split_data(image_list, labels)
     metadata_dict = get_saved_metrics(dir_path, tested)
     ranked_models = sort_models(metadata_dict, tested)
     top_n_models = filter_top_cv_models(ranked_models, n)  # get top n models, currently 5
