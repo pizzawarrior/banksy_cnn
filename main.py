@@ -42,9 +42,9 @@ def train_test_one_model(X_train, X_test, y_train, y_test):
     use this for fine tuning each of the params.
     '''
     hyperparams = {
-        'tile_h': 200, 'tile_w': 200, 'overlap': 0.8, 'entropy_threshold': 4,
-        'architecture': '3layer', 'learning_rate': 0.0001, 'batch_size': 16,
-        'classification_threshold': .6
+        'tile_h': 200, 'tile_w': 200, 'overlap': 0.8, 'entropy_threshold': 1.8,
+        'architecture': '3layer', 'learning_rate': 0.0001, 'batch_size': 32,
+        'classification_threshold': .5
     }
     _, history, result_paths = train_full(X_train, y_train, hyperparams)
     model_path = result_paths[0]
@@ -93,12 +93,12 @@ def main():
 
     ##############
     # get dataset
-    # image_list, labels = get_images()
-    # X_train, X_test, y_train, y_test = split_data(image_list, labels)
+    image_list, labels = get_images()
+    X_train, X_test, y_train, y_test = split_data(image_list, labels)
 
     ##############
-    # building cv trained models from scratch:
-    run_experiment()
+    # building cv trained models from scratch
+    # run_experiment()
 
     ##############
     # single model testing, full test dataset:
@@ -118,7 +118,7 @@ def main():
 
     ##############
     # train/ test one model using hyperparams pasted into the fn below
-    # train_test_one_model(X_train, X_test, y_train, y_test)
+    train_test_one_model(X_train, X_test, y_train, y_test)
 
 
 if __name__ == "__main__":
