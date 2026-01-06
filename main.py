@@ -98,7 +98,7 @@ def main():
 
     ##############
     # building cv trained models from scratch
-    # run_experiment()
+    run_experiment()
 
     ##############
     # single model testing, full test dataset:
@@ -118,7 +118,7 @@ def main():
 
     ##############
     # train/ test one model using hyperparams pasted into the fn below
-    train_test_one_model(X_train, X_test, y_train, y_test)
+    # train_test_one_model(X_train, X_test, y_train, y_test)
 
 
 if __name__ == "__main__":
