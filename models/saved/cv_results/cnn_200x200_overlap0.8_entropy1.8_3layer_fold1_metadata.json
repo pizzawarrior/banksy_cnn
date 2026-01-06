@@ -1,0 +1,27 @@
+{
+  "hyperparameters": {
+    "tile_h": 200,
+    "tile_w": 200,
+    "overlap": 0.8,
+    "entropy_threshold": 1.8,
+    "architecture": "3layer",
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "classification_threshold": 0.5
+  },
+  "model_path": "models/saved/cv_results/cnn_200x200_overlap0.8_entropy1.8_3layer_fold1.keras",
+  "history_path": "models/saved/cv_results/cnn_200x200_overlap0.8_entropy1.8_3layer_fold1_history.json",
+  "metrics": {
+    "tile_accuracy": 0.684322033898305,
+    "tile_f1": 0.6460807600950119,
+    "tile_recall": 0.576271186440678,
+    "tile_precision": 0.7351351351351352,
+    "tile_auc": 0.7907120798621087,
+    "img_accuracy": 0.5454545454545454,
+    "img_f1": 0.4444444444444444,
+    "img_recall": 0.3333333333333333,
+    "img_precision": 0.6666666666666666,
+    "img_auc": 0.7333333333333333
+  },
+  "fold": 1
+}

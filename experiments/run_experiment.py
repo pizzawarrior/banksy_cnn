@@ -21,7 +21,7 @@ def run_experiment():
         #     'classification_threshold': .4
         # },
         {
-            'tile_h': 200, 'tile_w': 200, 'overlap': 0.8, 'entropy_threshold': 1.2,
+            'tile_h': 200, 'tile_w': 200, 'overlap': 0.8, 'entropy_threshold': 1.8,
             'architecture': '3layer', 'learning_rate': 0.001, 'batch_size': 32,
             'classification_threshold': .5
         },
