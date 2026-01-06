@@ -67,6 +67,37 @@ These results came by way of using 200x200 sized tiles, a batch size of 32 tiles
 
 Fig. 6: These plots show the performance metrics from fold 4/4 of the training process for the selected model. The Loss plot on the right shows that the model begins overfitting around epoch 13, indicating that further tuning may be beneficial. Early stopping prevented the model from continuing beyond epoch 25 of 50 possible epochs.
 
+<br>
+<br>
+
+<img width="1188" height="434" alt="layers" src="https://github.com/user-attachments/assets/09a5a348-a739-4707-a8bd-0520813bb72c" />  
+
+Fig 7: This image illustrates the effect of applying convolution, activation, and pooling to a Banksy artwork. The convolutional filters– particularly in early layers– highlight both the bold outlines of the artwork and environmental textures, effectively tracing key visual elements. 
+
+<br>
+<br>
+
+<img width="400" alt="test-img" src="https://github.com/user-attachments/assets/e2be0564-0682-432c-940f-3b87fdcc875d" />  
+
+Fig. 8: Test Image 1 - Spy Booth, Cheltenham, UK, 2014.  
+Authenticity: Real  
+Entropy: 7.258  
+The model correctly classified this image as being ‘real,’ although just barely, with a probability of 43%, using the model classification threshold of 40%.  
+
+<br>
+<br>
+
+<img width="800" alt="entropy" src="https://github.com/user-attachments/assets/b8e9fc8e-78f7-4904-8f4f-a81fb903a2b2" />  
+
+Fig. 9: An example of the tiling scheme used for Test Image 1, utilizing 50% overlap with tile size of 200 x 200. Note that 1 of the 3 rejected tiles contained artwork. Of the 29 tiles that passed the entropy test, 4 tiles contained no Banksy artwork.  
+
+<br>
+<br>
+
+<img width="800" alt="classification" src="https://github.com/user-attachments/assets/a5aae3e1-8386-46ac-9c61-84b6fb87ad9a" />  
+
+Fig. 10: The 13 green tiles of Test Image 1 all had probabilities greater or equal to 0.5, while the probabilities for the 16 red tiles were lower. 12 of the 16 tiles classified as ‘not Banksy’ contained some amount of Banksy artwork. This shows how the model struggles with separating the artwork from the surrounding environment.  
+
 ### Conclusion
-Applying a convolutional neural network to assist in classifying Banksy’s artworks has shown promise as a companion tool alongside existing resources. This project highlights many of the inherent challenges and opportunities for further exploration in tackling such a complex task. Despite these limitations and such a small dataset, we are able to achieve notable results.
+Applying a convolutional neural network to assist in classifying Banksy’s artworks has shown promise as a companion tool alongside existing resources. This project highlights many of the inherent challenges and opportunities for further exploration in tackling such a complex task. With additional training data and further experimentation, a CNN model has the potential to reach performance levels comparable to those seen in other artist classification studies.
 
