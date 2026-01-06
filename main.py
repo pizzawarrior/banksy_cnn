@@ -92,7 +92,7 @@ def main():
     configure_tf()
 
     ##############
-    # get dataset
+    # get training and testing datasets
     # image_list, labels = get_images()
     # X_train, X_test, y_train, y_test = split_data(image_list, labels)
 
